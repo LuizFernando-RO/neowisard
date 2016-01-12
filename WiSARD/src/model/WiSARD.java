@@ -162,9 +162,24 @@ public class WiSARD {
 		
 			presentation += "Currently, I recognize no patterns. I can't wait to start learning!\n\n";
 		
+		else if(numberOfPatterns() == 1)
+			
+			presentation += "Currently, I recognize " + numberOfPatterns() + " pattern, described as follows:\n\n";
+		
 		else
 			
-			presentation += "Currently, I recognize " + numberOfPatterns() + " patterns. described as follows:\n\n";
+			presentation += "Currently, I recognize " + numberOfPatterns() + " patterns, described as follows:\n\n";
+		
+		Iterator<Entry<String, Discriminator>> iterador = mapa.entrySet().iterator();
+		
+		while(iterador.hasNext()) {
+			
+			Entry<String, Discriminator> elemento = iterador.next();
+			
+			presentation += elemento.getKey() + " ";	
+		}
+		
+		presentation += "\n\n";
 		
 		return presentation;
 	}
