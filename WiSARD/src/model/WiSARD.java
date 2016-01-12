@@ -6,6 +6,8 @@ import java.util.Map.Entry;
 
 public class WiSARD {
 	
+	private String name;
+	
 	private int height;
 	private int width;
 	
@@ -16,12 +18,17 @@ public class WiSARD {
 	private HashMap<Integer, String> relacao1 = new HashMap<Integer, String>();
 	private HashMap<String, Integer> relacao2 = new HashMap<String, Integer>();
 	
-	public WiSARD(int height, int width, int tuples) {
+	public WiSARD(String name, int height, int width, int tuples) {
 		
+		this.name = name;
 		this.height = height;
 		this.width = width;
 		this.tuples = tuples;
 		this.rams = height * width / tuples;
+	}
+	
+	public String getName() {
+		return this.name;
 	}
 	
 	public int getTuples() {
@@ -30,6 +37,18 @@ public class WiSARD {
 	
 	public int getRams() {
 		return this.rams;
+	}
+	
+	public int getHeight() {
+		return this.height;
+	}
+	
+	public int getWidth() {
+		return this.width;
+	}
+	
+	public int numberOfPatterns() {
+		return this.mapa.size();
 	}
 	
 	public void training(String label, String example ) {
@@ -129,5 +148,24 @@ public class WiSARD {
 	
 	public void mentalImage() {
 		
+	}
+	
+	@Override
+	public String toString() {
+		String presentation = "";
+		
+		presentation += "I'm " + getName() + ", a WiSARD instance.\n\n";
+		
+		presentation += "I'm supposed to see a " + getHeight() + " x " + getWidth() + " retina.\n\n";
+		
+		if(numberOfPatterns() == 0)
+		
+			presentation += "Currently, I recognize no patterns. I can't wait to start learning!\n\n";
+		
+		else
+			
+			presentation += "Currently, I recognize " + numberOfPatterns() + " patterns. described as follows:\n\n";
+		
+		return presentation;
 	}
 }
