@@ -27,22 +27,23 @@ public class Main {
 		WiSARD w1 = new WiSARD("w1", 28,28,28);
 		
 		//splitFiles();
+		
 		train(w1, 60000, "Input/MNIST/Original/training.csv");
 		
 		//System.out.println(w1.toString());
 		
-		//w1.mentalImage("0");
+		//test(w1, 10000, "Input/MNIST/Original/testing.csv");
 		
-		test(w1, 10000, "Input/MNIST/Original/testing.csv");
+		//w1.mentalImage("5");
 		
 		endTime = System.nanoTime();
 		
-		System.out.println("-- Execution time: " + duration() + "ms --");
+		System.out.println("\n-- Execution time: " + duration() + "ms --");
 	}
 	
 	public static void train(WiSARD w1, int trainingSize, String path) {
 		
-		System.out.println("-- Initializing training phase --");
+		System.out.println("-- Initializing training phase --\n");
 		
 		int m = 28;
 		
@@ -94,7 +95,7 @@ public class Main {
 			System.out.println("Error!");
 		}
 		
-		System.out.println("-- Training phase finished successfully --");
+		System.out.println("\n-- Training phase finished successfully --");
 	}
 	
 	public static void test(WiSARD w1, int testingSize, String path) {
@@ -158,7 +159,7 @@ public class Main {
 		
 		System.out.println(counter + " / " + testingSize + " : " + ((float) counter / testingSize) + "%");
 		
-		System.out.println("-- Testing phase finished successfully --");
+		System.out.println("\n-- Testing phase finished successfully --");
 	}
 	
 	public static void splitFiles() {

@@ -53,11 +53,11 @@ public class Discriminator {
 		this.rams = rams;
 	}
 	
-	private void inicializarTupla(int tamanho) {
+	private void inicializarTupla(int size) {
 		
 		this.tuplas = new ArrayList<Integer>();
 		
-		int[] array = new int[tamanho];
+		int[] array = new int[size];
 		int posicao, aux;
 		
 		Random rand = new Random();
@@ -69,7 +69,7 @@ public class Discriminator {
 		
 		for (int i = 0; i < array.length; i++) {
 			
-			posicao = rand.nextInt(tamanho);
+			posicao = rand.nextInt(size);
 			
 			aux = array[i];
 			array[i] = array[posicao];
@@ -97,6 +97,18 @@ public class Discriminator {
 	@Override
 	public String toString(){
 		
-		return "Sou o discriminador responsavel pelo " + this.id;
+		String presentation = "";
+		
+		presentation += "I'm the discriminator responsible for " + this.id + "\n\n";
+		
+		presentation += "My pseudo-random mapping is:\n";
+		
+		for(int i = 0; i < getTuplas().size(); i++) 
+			
+			presentation += getTuplas().get(i) + " ";
+		
+		presentation += "\n";
+		
+		return presentation;
 	}
 }

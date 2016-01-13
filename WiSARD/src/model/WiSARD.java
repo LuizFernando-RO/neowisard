@@ -83,7 +83,6 @@ public class WiSARD {
 		}
 		
 		StringBuilder value;
-		long aux;
 		int l;
 		
 		if(mapa.get(label) == null) {
@@ -109,7 +108,7 @@ public class WiSARD {
 				
 				value.append(example.charAt(mapa.get(label).getTuplas().get(k))) ;
 			
-			if(mapa.get(label).getRams().get(l).getMapa().get(value) == null) 
+			if(mapa.get(label).getRams().get(l).getMapa().get(value.toString()) == null) 
 			
 				mapa.get(label).getRams().get(l).getMapa().put(value.toString(), 1);
 			
@@ -133,7 +132,6 @@ public class WiSARD {
 		String label = "";
 		
 		StringBuilder value;
-		long aux;
 		int l;
 		
 		int[] similarity = new int[mapa.size()];
@@ -187,7 +185,61 @@ public class WiSARD {
 			return;
 		}
 		
+		int[] image = new int[getHeight() * getWidth()];
+		
+		Discriminator d = mapa.get(label);
+		RAM r;
+		
+		for(int i = 0; i < d.getnRams(); i++) {
+			
+			r = d.getRams().get(i);
+			
+			Iterator<Entry<String, Integer>> iterator = r.getMapa().entrySet().iterator();
+			
+			while(iterator.hasNext()) {
+				
+				Entry<String, Integer> element = iterator.next();
+				
+				for(int j = 0; j < getTuples(); j++ ) 
+					
+					image[d.getTuplas().get(i*getTuples()+j)] += Integer.valueOf(element.getKey().charAt(j) - '0') * element.getValue();
+				
+			}			
+		}
+		
 		System.out.println("This is what I understand of a '" + label + "':\n\n");
+		
+		int acc = 0;
+		
+		for(int i = 0; i < getWidth(); i++) {
+			
+			for (int j = 0; j < getHeight(); j++) {
+				
+				acc += image[i*getWidth()+j];
+				
+				System.out.print(image[i*getWidth()+j] + "\t");
+			}
+			
+			System.out.println();
+		}
+		
+		System.out.println("The mean is " + (acc / (getWidth()*getHeight())) + ". Now I'm gonna use this as threshold for you to recognize it..." );
+		
+		for(int i = 0; i < getWidth(); i++) {
+			
+			for (int j = 0; j < getHeight(); j++) {
+				
+				if(image[i*getWidth()+j] < (acc / (getWidth()*getHeight())) )
+				
+					System.out.print("0");
+				
+				else
+					
+					System.out.print("1");
+			}
+			
+			System.out.println();
+		}
 	}
 	
 	@Override
