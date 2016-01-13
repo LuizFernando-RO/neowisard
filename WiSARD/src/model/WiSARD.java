@@ -122,6 +122,8 @@ public class WiSARD {
 	
 	public String testing(String test) {
 		
+		//Needs to implement bleaching
+		
 		if(!getValid()) {
 			
 			System.out.println("I can't work on this configuration, sorry!");

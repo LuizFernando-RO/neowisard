@@ -26,21 +26,42 @@ public class Main {
 		startTime = System.nanoTime();
 		
 		WiSARD w1 = new WiSARD("w1", 28,28,28);
-		WiSARD w2 = new WiSARD("w1", 28,28,28);
+		WiSARD w2 = new WiSARD("w2", 28,28,28);
 		
-		totalSplitFiles();
+		train(w1, 5923/2, "Input/MNIST/Balanced/01.txt");
+		train(w2, 5923/2 + 1, "Input/MNIST/Balanced/02.txt");
 		
-		//splitFiles();
+		train(w1, 6742/2, "Input/MNIST/Balanced/11.txt");
+		train(w2, 6742/2, "Input/MNIST/Balanced/12.txt");
 		
-		//train(w1, 60000, "Input/MNIST/Original/training.csv");
+		train(w1, 5958/2, "Input/MNIST/Balanced/21.txt");
+		train(w2, 5958/2, "Input/MNIST/Balanced/22.txt");
 		
-		//System.out.println(w1.toString());
+		train(w1, 6131/2, "Input/MNIST/Balanced/31.txt");
+		train(w2, 6131/2 + 1, "Input/MNIST/Balanced/32.txt");
 		
-		//test(w1, 10000, "Input/MNIST/Original/testing.csv");
+		train(w1, 5842/2, "Input/MNIST/Balanced/41.txt");
+		train(w2, 5842/2, "Input/MNIST/Balanced/42.txt");
 		
-		//w1.mentalImage("5");
+		train(w1, 5421/2, "Input/MNIST/Balanced/51.txt");
+		train(w2, 5421/2 + 1, "Input/MNIST/Balanced/52.txt");
 		
-		//randomSplitFiles();
+		train(w1, 5918/2, "Input/MNIST/Balanced/61.txt");
+		train(w2, 5918/2, "Input/MNIST/Balanced/62.txt");
+		
+		train(w1, 6265/2, "Input/MNIST/Balanced/71.txt");
+		train(w2, 6265/2 + 1, "Input/MNIST/Balanced/72.txt");
+		
+		train(w1, 5851/2, "Input/MNIST/Balanced/81.txt");
+		train(w2, 5851/2 + 1, "Input/MNIST/Balanced/82.txt");
+		
+		train(w1, 5949/2, "Input/MNIST/Balanced/91.txt");
+		train(w2, 5949/2 + 1, "Input/MNIST/Balanced/92.txt");
+		
+		System.out.println(w1.toString());
+		System.out.println(w2.toString());
+		
+		/**/
 		
 		endTime = System.nanoTime();
 		
@@ -169,12 +190,10 @@ public class Main {
 	}
 	
 	// This method divide the dataset into 2 files
-	public static void autoSplitFiles() {
+	public static void autoSplitFiles(String pathOrigin, String pathDestiny1, String pathDestiny2, int trainingSize) {
 		
-		int trainingSize = 60000;
-		
-		File f = new File("Input/MNIST/Original/training.csv");
-		File f2 = new File("Input/MNIST/Auto Split/train1.txt");
+		File f = new File(pathOrigin);
+		File f2 = new File(pathDestiny1);
 		
 		FileReader fr;
 		FileWriter fw;
@@ -193,7 +212,7 @@ public class Main {
 			
 			bw.close();
 			
-			f2 = new File("Input/MNIST/Auto Split/train2.txt");
+			f2 = new File(pathDestiny2);
 			
 			fw = new FileWriter(f2);
 			bw = new BufferedWriter(fw);
@@ -215,10 +234,8 @@ public class Main {
 	}
 	
 	// This method divide the dataset into 2 files with random samples
-	public static void randomSplitFiles() {
-		
-		int trainingSize = 60000;
-		
+	public static void randomSplitFiles(String pathOrigin, String pathDestiny1, String pathDestiny2, int trainingSize) {
+				
 		ArrayList<String> arr = new ArrayList<String>();
 		
 		int[] array = new int[trainingSize];
@@ -240,7 +257,7 @@ public class Main {
 			array[posicao] = aux;
 		}
 		
-		File f = new File("Input/MNIST/Original/training.csv");
+		File f = new File(pathOrigin);
 		
 		FileReader fr;
 		BufferedReader br;
@@ -264,7 +281,7 @@ public class Main {
 			System.out.println("Error!");
 		}
 	
-		File f2 = new File("Input/MNIST/Random Split/train1.txt");
+		File f2 = new File(pathDestiny1);
 		
 		FileWriter fw;
 		BufferedWriter bw;
@@ -280,7 +297,7 @@ public class Main {
 			
 			bw.close();
 			
-			f2 = new File("Input/MNIST/Random Split/train2.txt");
+			f2 = new File(pathDestiny2);
 
 			fw = new FileWriter(f2);
 			bw = new BufferedWriter(fw);
@@ -299,6 +316,20 @@ public class Main {
 			
 			System.out.println("Error!");
 		}
+	}
+	
+	public static void splitTotalSplittedFiles() {
+		
+		randomSplitFiles("Input/MNIST/Total Split/0.txt", "Input/MNIST/Balanced/01.txt", "Input/MNIST/Balanced/02.txt", 5923);
+		randomSplitFiles("Input/MNIST/Total Split/1.txt", "Input/MNIST/Balanced/11.txt", "Input/MNIST/Balanced/12.txt", 6742);
+		randomSplitFiles("Input/MNIST/Total Split/2.txt", "Input/MNIST/Balanced/21.txt", "Input/MNIST/Balanced/22.txt", 5958);
+		randomSplitFiles("Input/MNIST/Total Split/3.txt", "Input/MNIST/Balanced/31.txt", "Input/MNIST/Balanced/32.txt", 6131);
+		randomSplitFiles("Input/MNIST/Total Split/4.txt", "Input/MNIST/Balanced/41.txt", "Input/MNIST/Balanced/42.txt", 5842);
+		randomSplitFiles("Input/MNIST/Total Split/5.txt", "Input/MNIST/Balanced/51.txt", "Input/MNIST/Balanced/52.txt", 5421);
+		randomSplitFiles("Input/MNIST/Total Split/6.txt", "Input/MNIST/Balanced/61.txt", "Input/MNIST/Balanced/62.txt", 5918);
+		randomSplitFiles("Input/MNIST/Total Split/7.txt", "Input/MNIST/Balanced/71.txt", "Input/MNIST/Balanced/72.txt", 6265);
+		randomSplitFiles("Input/MNIST/Total Split/8.txt", "Input/MNIST/Balanced/81.txt", "Input/MNIST/Balanced/82.txt", 5851);
+		randomSplitFiles("Input/MNIST/Total Split/9.txt", "Input/MNIST/Balanced/91.txt", "Input/MNIST/Balanced/92.txt", 5949);
 	}
 	
 	// This method divide the dataset into 10 files, according to the sample label
