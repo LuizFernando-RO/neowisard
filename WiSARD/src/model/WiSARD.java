@@ -18,7 +18,21 @@ public class WiSARD {
 	private HashMap<Integer, String> relacao1 = new HashMap<Integer, String>();
 	private HashMap<String, Integer> relacao2 = new HashMap<String, Integer>();
 	
+	boolean valid;
+	
 	public WiSARD(String name, int height, int width, int tuples) {
+		
+		if((height * width % tuples) != 0 ) {
+			
+			this.valid = false;
+			
+			System.out.println("This is not a valid configuration of retina x tuple!");	
+		}
+		
+		else {
+			
+			this.valid = true;
+		}
 		
 		this.name = name;
 		this.height = height;
@@ -51,7 +65,18 @@ public class WiSARD {
 		return this.mapa.size();
 	}
 	
+	public boolean getValid() {
+		return this.valid;
+	}
+	
 	public void training(String label, String example ) {
+		
+		if(!getValid()) {
+			
+			System.out.println("I can't work on this configuration, sorry!");
+			
+			return;
+		}
 		
 		long value;
 		long aux;
@@ -94,6 +119,13 @@ public class WiSARD {
 	}
 	
 	public String testing(String test) {
+		
+		if(!getValid()) {
+			
+			System.out.println("I can't work on this configuration, sorry!");
+			
+			return "";
+		}
 		
 		String label = "";
 		
@@ -179,7 +211,7 @@ public class WiSARD {
 			presentation += elemento.getKey() + " ";	
 		}
 		
-		presentation += "\n\n";
+		presentation += "\n";
 		
 		return presentation;
 	}

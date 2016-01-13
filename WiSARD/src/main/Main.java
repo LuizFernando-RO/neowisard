@@ -12,81 +12,138 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import model.Discriminator;
 import model.WiSARD;
 
 public class Main {
 
 	public static void main(String[] args) {
 		
-		splitFiles();
-	}
-	
-	public static void brainStorm() {
-		
-		int testingSize = 10000;
-		int trainingSize = 60000;
-		int m = 28;
-		
 		WiSARD w1 = new WiSARD("w1", 28,28,28);
+		
+		//splitFiles();
+		train(w1, 60000, "Input/MNIST/Original/training.csv");
 		
 		System.out.println(w1.toString());
 		
-		WiSARD w2 = new WiSARD("w2", 28,28,28);
+		test(w1, 10000, "Input/MNIST/Original/testing.csv");
+	}
+	
+	public static void train(WiSARD w1, int trainingSize, String path) {
 		
-		System.out.println(w2.toString());
+		int m = 28;
 		
 		StringBuilder example;
 		String[] splitter;
 		String label;
 		
-		File f = new File("Input/MNIST/training.csv");
-		
+		File f;
 		FileReader fr;
+		BufferedReader br;
+
+		f = new File(path);
 		
 		try {
+			
 			fr = new FileReader(f);
-			BufferedReader br = new BufferedReader(fr);
+			br = new BufferedReader(fr);
+		
+			for(int i = 0; i < trainingSize; i++) {
 			
-			example = new StringBuilder();
-			
-			splitter = br.readLine().trim().split(",");
-
-			label = splitter[0];
-			
-			for(int j = 1; j < m*m + 1; j++) {
+				example = new StringBuilder();
 				
-				if(Integer.valueOf(splitter[j]) > 0)
-					
-					example.append("1");
+				splitter = br.readLine().trim().split(",");
+	
+				label = splitter[0];
 				
-				else
+				for(int j = 1; j < m*m + 1; j++) {
 					
-					example.append("0");
+					if(Integer.valueOf(splitter[j]) > 0)
+						
+						example.append("1");
+					
+					else
+						
+						example.append("0");
+				}
+				
+				w1.training(label, example.toString());
 			}
-			
-			w1.training(label, example.toString());
 			
 			br.close();
 			
 		} catch (FileNotFoundException e) {
 			
 			System.out.println("File not found!");
+			
+		} catch (IOException e) {
+			
+			System.out.println("Error!");
+		}
+	}
+	
+	public static void test(WiSARD w1, int testingSize, String path) {
+		
+		int m = 28;
+		
+		StringBuilder example;
+		String[] splitter;
+		String label, result = "";
+		int counter = 0;
+		
+		File f;
+		FileReader fr;
+		BufferedReader br;
+		
+		f = new File(path);
+		
+		try {
+			
+			fr = new FileReader(f);
+			br = new BufferedReader(fr);
+		
+			for(int i = 0; i < testingSize; i++) {
+			
+				example = new StringBuilder();
+				
+				splitter = br.readLine().trim().split(",");
+	
+				label = splitter[0];
+				
+				for(int j = 1; j < m*m + 1; j++) {
+					
+					if(Integer.valueOf(splitter[j]) > 0)
+						
+						example.append("1");
+					
+					else
+						
+						example.append("0");
+				}
+				
+				result = w1.testing(example.toString());
+				
+				if(result.equals(label))
+					
+					counter++;
+			}
+			
+			br.close();
+			
+		} catch (FileNotFoundException e) {
+			
+			System.out.println("File not found!");
+			
 		} catch (IOException e) {
 			
 			System.out.println("Error!");
 		}
 		
-		System.out.println(w1.toString());
-		
-		System.out.println(w2.toString());
+		System.out.println(counter + " / " + testingSize + " : " + ((float) counter / testingSize) + "%");
 	}
 	
 	public static void splitFiles() {
 		
-		int testingSize = 10000;
 		int trainingSize = 60000;
-		int m = 28;
 		
 		String example, label;
 		String[] splitter;
@@ -135,9 +192,7 @@ public class Main {
 			
 			System.out.println("Error!");
 		}
-		
-		// - 
-		
+				
 		Iterator<Entry<String, ArrayList<String>>> iterator = classes.entrySet().iterator();
 		
 		while(iterator.hasNext()) {
