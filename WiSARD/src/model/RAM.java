@@ -5,15 +5,15 @@ import java.util.HashMap;
 public class RAM {
 	
 	private int nBits;
-	private HashMap<Long, Integer> mapa;
+	private HashMap<String, Integer> mapa;
 	
 	public RAM() {
-		this.mapa = new HashMap<Long, Integer>();
+		this.mapa = new HashMap<String, Integer>();
 	}
 	
 	public RAM(int m) {
 		this.nBits = m;
-		this.mapa = new HashMap<Long, Integer>();
+		this.mapa = new HashMap<String, Integer>();
 	}
 
 	public int getnBits() {
@@ -24,15 +24,15 @@ public class RAM {
 		this.nBits = nBits;
 	}
 
-	public RAM(HashMap<Long, Integer> mapa) {
+	public RAM(HashMap<String, Integer> mapa) {
 		this.mapa = mapa;
 	}
 	
-	public HashMap<Long, Integer> getMapa() {
+	public HashMap<String, Integer> getMapa() {
 		return mapa;
 	}
 
-	public void setMapa(HashMap<Long, Integer> mapa) {
+	public void setMapa(HashMap<String, Integer> mapa) {
 		this.mapa = mapa;
 	}
 }

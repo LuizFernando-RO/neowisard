@@ -11,24 +11,38 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import model.WiSARD;
 
 public class Main {
 
+	public static long startTime;
+	public static long endTime;
+	
 	public static void main(String[] args) {
+		
+		startTime = System.nanoTime();
 		
 		WiSARD w1 = new WiSARD("w1", 28,28,28);
 		
 		//splitFiles();
 		train(w1, 60000, "Input/MNIST/Original/training.csv");
 		
-		System.out.println(w1.toString());
+		//System.out.println(w1.toString());
+		
+		//w1.mentalImage("0");
 		
 		test(w1, 10000, "Input/MNIST/Original/testing.csv");
+		
+		endTime = System.nanoTime();
+		
+		System.out.println("-- Execution time: " + duration() + "ms --");
 	}
 	
 	public static void train(WiSARD w1, int trainingSize, String path) {
+		
+		System.out.println("-- Initializing training phase --");
 		
 		int m = 28;
 		
@@ -79,9 +93,13 @@ public class Main {
 			
 			System.out.println("Error!");
 		}
+		
+		System.out.println("-- Training phase finished successfully --");
 	}
 	
 	public static void test(WiSARD w1, int testingSize, String path) {
+		
+		System.out.println("-- Initializing testing phase --");
 		
 		int m = 28;
 		
@@ -139,6 +157,8 @@ public class Main {
 		}
 		
 		System.out.println(counter + " / " + testingSize + " : " + ((float) counter / testingSize) + "%");
+		
+		System.out.println("-- Testing phase finished successfully --");
 	}
 	
 	public static void splitFiles() {
@@ -223,5 +243,10 @@ public class Main {
 				System.out.println("Error!");
 			}
 		}
+	}
+	
+	public static long duration() {
+		
+		return  TimeUnit.NANOSECONDS.toMillis(endTime) - TimeUnit.NANOSECONDS.toMillis(startTime);
 	}
 }

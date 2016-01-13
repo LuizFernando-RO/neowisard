@@ -14,7 +14,7 @@ public class WiSARD {
 	private int tuples;
 	private int rams;
 	
-	private HashMap<String, Discriminator> mapa = new HashMap<String, Discriminator>();
+	private HashMap<String, Discriminator> mapa;
 	private HashMap<Integer, String> relacao1 = new HashMap<Integer, String>();
 	private HashMap<String, Integer> relacao2 = new HashMap<String, Integer>();
 	
@@ -33,6 +33,10 @@ public class WiSARD {
 			
 			this.valid = true;
 		}
+		
+		this.mapa = new HashMap<String, Discriminator>();
+		this.relacao1 = new HashMap<Integer, String>();
+		this.relacao2 = new HashMap<String, Integer>();
 		
 		this.name = name;
 		this.height = height;
@@ -78,11 +82,13 @@ public class WiSARD {
 			return;
 		}
 		
-		long value;
+		StringBuilder value;
 		long aux;
 		int l;
 		
 		if(mapa.get(label) == null) {
+			
+			System.out.println("New pattern: '" + label + "' learned");
 			
 			Discriminator discriminator = new Discriminator(getRams(), getTuples());
 			discriminator.setId(label);
@@ -97,22 +103,19 @@ public class WiSARD {
 		
 		for (int j = 0; j < mapa.get(label).getTuplas().size(); j = j + getTuples()) {
 			
-			value = 0;
-			aux = (int) Math.pow(2, getTuples());
+			value = new StringBuilder();
 			
-			for (int k = j; k < j + getTuples(); k++) {
+			for (int k = j; k < j + getTuples(); k++)
 				
-				value += Integer.valueOf(example.charAt(mapa.get(label).getTuplas().get(k))) * aux;
-				aux /= 2;
-			}
+				value.append(example.charAt(mapa.get(label).getTuplas().get(k))) ;
 			
-			if(mapa.get(label).getRams().get(l).getMapa().get(value) == null)
+			if(mapa.get(label).getRams().get(l).getMapa().get(value) == null) 
 			
-				mapa.get(label).getRams().get(l).getMapa().put(value, 1);
+				mapa.get(label).getRams().get(l).getMapa().put(value.toString(), 1);
 			
 			else
 				
-				mapa.get(label).getRams().get(l).getMapa().put(value, mapa.get(label).getRams().get(l).getMapa().get(value) + 1);
+				mapa.get(label).getRams().get(l).getMapa().put(value.toString(), mapa.get(label).getRams().get(l).getMapa().get(value.toString()) + 1);
 			
 			l++;
 		}
@@ -129,7 +132,7 @@ public class WiSARD {
 		
 		String label = "";
 		
-		long value;
+		StringBuilder value;
 		long aux;
 		int l;
 		
@@ -145,16 +148,13 @@ public class WiSARD {
 			
 			for (int j = 0; j < elemento.getValue().getTuplas().size(); j = j + getTuples()) {
 				
-				value = 0;
-				aux = (int) Math.pow(2, getTuples());
+				value = new StringBuilder();
 				
-				for (int k = j; k < j + getTuples(); k++) {
+				for (int k = j; k < j + getTuples(); k++)
 					
-					value += Integer.valueOf(test.charAt(mapa.get(elemento.getKey()).getTuplas().get(k))) * aux;
-					aux /= 2;
-				}
+					value.append(test.charAt(mapa.get(elemento.getKey()).getTuplas().get(k)));
 				
-				if(mapa.get(elemento.getKey()).getRams().get(l).getMapa().get(value) != null)
+				if(mapa.get(elemento.getKey()).getRams().get(l).getMapa().get(value.toString()) != null)
 				
 					similarity[relacao2.get(elemento.getKey())]++;
 				
@@ -178,8 +178,16 @@ public class WiSARD {
 		return label;
 	}
 	
-	public void mentalImage() {
+	public void mentalImage(String label) {
 		
+		if(mapa.get(label) == null) {
+			
+			System.out.println("Sorry, but I don't know what you are talking about...");
+			
+			return;
+		}
+		
+		System.out.println("This is what I understand of a '" + label + "':\n\n");
 	}
 	
 	@Override
