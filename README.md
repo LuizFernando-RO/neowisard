@@ -1,5 +1,7 @@
 # NeoWiSARD
-Weightless Neural Network project
+Weightless Neural Network project.
+
+First steps include developing a piece of software capable of creating several instances of a WiSARD model.
 
 #A bit about WiSARD
 
@@ -8,6 +10,10 @@ WiSARD is a Weightless Neural Network model created by Wilkie, Stonham and Aleks
 Basic WiSARD takes a binary x by y input - referred as retina - and creates a pseudo-random mapping between a set of n pixels - or n-tuples - and an address of a RAM memory. The address if formed from the concatanation of the values stored in the pixels.
 
 WiSARD's main advantage is the extremely fast training phase.
+
+#A bit about DRASiW
+
+DRASiW is an adaptation os the WiSARD model that is capable of generating what can be considered as the WiSARD's mental images. What it does is to, given the label of a learned pattern, pick all information stored in the correspondent discriminator's RAMs and produce a gray-scale image based on that information.
 
 #A bit about Transfer Learning
 
