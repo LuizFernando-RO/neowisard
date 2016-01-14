@@ -28,40 +28,12 @@ public class Main {
 		WiSARD w1 = new WiSARD("w1", 28,28,28);
 		WiSARD w2 = new WiSARD("w2", 28,28,28);
 		
-		train(w1, 5923/2, "Input/MNIST/Balanced/01.txt");
-		train(w2, 5923/2 + 1, "Input/MNIST/Balanced/02.txt");
+		//autoTraining(w1, w2);
+		//randomTraining(w1, w2);
+		//balancedTraining(w1, w2);
 		
-		train(w1, 6742/2, "Input/MNIST/Balanced/11.txt");
-		train(w2, 6742/2, "Input/MNIST/Balanced/12.txt");
-		
-		train(w1, 5958/2, "Input/MNIST/Balanced/21.txt");
-		train(w2, 5958/2, "Input/MNIST/Balanced/22.txt");
-		
-		train(w1, 6131/2, "Input/MNIST/Balanced/31.txt");
-		train(w2, 6131/2 + 1, "Input/MNIST/Balanced/32.txt");
-		
-		train(w1, 5842/2, "Input/MNIST/Balanced/41.txt");
-		train(w2, 5842/2, "Input/MNIST/Balanced/42.txt");
-		
-		train(w1, 5421/2, "Input/MNIST/Balanced/51.txt");
-		train(w2, 5421/2 + 1, "Input/MNIST/Balanced/52.txt");
-		
-		train(w1, 5918/2, "Input/MNIST/Balanced/61.txt");
-		train(w2, 5918/2, "Input/MNIST/Balanced/62.txt");
-		
-		train(w1, 6265/2, "Input/MNIST/Balanced/71.txt");
-		train(w2, 6265/2 + 1, "Input/MNIST/Balanced/72.txt");
-		
-		train(w1, 5851/2, "Input/MNIST/Balanced/81.txt");
-		train(w2, 5851/2 + 1, "Input/MNIST/Balanced/82.txt");
-		
-		train(w1, 5949/2, "Input/MNIST/Balanced/91.txt");
-		train(w2, 5949/2 + 1, "Input/MNIST/Balanced/92.txt");
-		
-		System.out.println(w1.toString());
-		System.out.println(w2.toString());
-		
-		/**/
+		test(w1, 10000, "Input/MNIST/Original/testing.csv");
+		test(w2, 10000, "Input/MNIST/Original/testing.csv");
 		
 		endTime = System.nanoTime();
 		
@@ -187,6 +159,51 @@ public class Main {
 		System.out.println(counter + " / " + testingSize + " : " + ((float) counter / testingSize) + "%");
 		
 		System.out.println("\n-- Testing phase finished successfully --");
+	}
+	
+	public static void autoTraining(WiSARD w1, WiSARD w2) {
+		
+		train(w1, 30000, "Input/MNIST/Auto Split/train1.txt");
+		train(w2, 30000, "Input/MNIST/Auto Split/train2.txt");
+	}
+	
+	public static void balancedTraining(WiSARD w1, WiSARD w2) {
+		
+		train(w1, 5923/2, "Input/MNIST/Balanced/01.txt");
+		train(w2, 5923/2 + 1, "Input/MNIST/Balanced/02.txt");
+		
+		train(w1, 6742/2, "Input/MNIST/Balanced/11.txt");
+		train(w2, 6742/2, "Input/MNIST/Balanced/12.txt");
+		
+		train(w1, 5958/2, "Input/MNIST/Balanced/21.txt");
+		train(w2, 5958/2, "Input/MNIST/Balanced/22.txt");
+		
+		train(w1, 6131/2, "Input/MNIST/Balanced/31.txt");
+		train(w2, 6131/2 + 1, "Input/MNIST/Balanced/32.txt");
+		
+		train(w1, 5842/2, "Input/MNIST/Balanced/41.txt");
+		train(w2, 5842/2, "Input/MNIST/Balanced/42.txt");
+		
+		train(w1, 5421/2, "Input/MNIST/Balanced/51.txt");
+		train(w2, 5421/2 + 1, "Input/MNIST/Balanced/52.txt");
+		
+		train(w1, 5918/2, "Input/MNIST/Balanced/61.txt");
+		train(w2, 5918/2, "Input/MNIST/Balanced/62.txt");
+		
+		train(w1, 6265/2, "Input/MNIST/Balanced/71.txt");
+		train(w2, 6265/2 + 1, "Input/MNIST/Balanced/72.txt");
+		
+		train(w1, 5851/2, "Input/MNIST/Balanced/81.txt");
+		train(w2, 5851/2 + 1, "Input/MNIST/Balanced/82.txt");
+		
+		train(w1, 5949/2, "Input/MNIST/Balanced/91.txt");
+		train(w2, 5949/2 + 1, "Input/MNIST/Balanced/92.txt");
+	}
+	
+	public static void randomTraining(WiSARD w1, WiSARD w2) {
+		
+		train(w1, 30000, "Input/MNIST/Random Split/train1.txt");
+		train(w2, 30000, "Input/MNIST/Random Split/train2.txt");
 	}
 	
 	// This method divide the dataset into 2 files
