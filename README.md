@@ -1,7 +1,7 @@
 # NeoWiSARD
 Weightless Neural Network project.
 
-First steps include developing a piece of software capable of creating several instances of a WiSARD model.
+First steps include developing a piece of software capable of creating several instances of a WiSARD model and transfer knowledge between two WiSARD instances trained, each one, with a different datasets about the same problem.
 
 #A bit about WiSARD
 
