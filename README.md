@@ -9,7 +9,7 @@ WiSARD is a Weightless Neural Network model created by Wilkie, Stonham and Aleks
 
 Basic WiSARD takes a binary x by y input - referred as retina - and creates a pseudo-random mapping between a set of n pixels - or n-tuples - and an address of a RAM memory. The address if formed from the concatanation of the values stored in the pixels.
 
-WiSARD's main advantage is the extremely fast training phase.
+WiSARD's main advantages are the extremely fast training phase and the simple representation used by the model.
 
 #A bit about DRASiW
 
