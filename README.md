@@ -13,7 +13,7 @@ WiSARD's main advantages are the extremely fast training phase and the simple re
 
 #A bit about DRASiW
 
-DRASiW is an adaptation os the WiSARD model that is capable of generating what can be considered as the WiSARD's mental images. What it does is to, given the label of a learned pattern, pick all information stored in the correspondent discriminator's RAMs and produce a gray-scale image based on that information.
+DRASiW is an adaptation of the WiSARD model that is capable of generating what can be considered as the WiSARD's mental images. What it does is to, given the label of a learned pattern, pick all information stored in the correspondent discriminator's RAMs and produce a gray-scale image based on that information.
 
 #A bit about Transfer Learning
 
