@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import model.WiSARD;
 
-public class Main {
+public class OptDigits {
 
 	public static long startTime;
 	public static long endTime;
@@ -30,10 +30,16 @@ public class Main {
 		
 		//autoTraining(w1, w2);
 		//randomTraining(w1, w2);
-		//balancedTraining(w1, w2);
+		
+		splitTotalSplittedFiles();
+		balancedTraining(w1, w2);
 		
 		test(w1, 10000, "Input/MNIST/Original/testing.csv");
 		test(w2, 10000, "Input/MNIST/Original/testing.csv");
+		
+		w1.mentalImage("3");
+		
+		w2.mentalImage("3");
 		
 		endTime = System.nanoTime();
 		
