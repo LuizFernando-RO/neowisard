@@ -14,6 +14,8 @@ public class WiSARD {
 	private int tuples;
 	private int rams;
 	
+	private int maxBleaching;
+	
 	private HashMap<String, Discriminator> mapa;
 	private HashMap<Integer, String> relacao1 = new HashMap<Integer, String>();
 	private HashMap<String, Integer> relacao2 = new HashMap<String, Integer>();
@@ -73,6 +75,15 @@ public class WiSARD {
 		return this.valid;
 	}
 	
+	public void setMaxBleaching(int maxBleaching) {
+		
+		this.maxBleaching = maxBleaching;
+	}
+	
+	public int getMaxBleaching() {
+		return this.maxBleaching;
+	}
+	
 	public void training(String label, String example ) {
 		
 		if(!getValid()) {
@@ -112,17 +123,21 @@ public class WiSARD {
 			
 				mapa.get(label).getRams().get(l).getMapa().put(value.toString(), 1);
 			
-			else
+			else {
 				
 				mapa.get(label).getRams().get(l).getMapa().put(value.toString(), mapa.get(label).getRams().get(l).getMapa().get(value.toString()) + 1);
+			
+				if(mapa.get(label).getRams().get(l).getMapa().get(value.toString()) > getMaxBleaching()) {
+					
+					setMaxBleaching(mapa.get(label).getRams().get(l).getMapa().get(value.toString()));
+				}
+			}
 			
 			l++;
 		}
 	}
 	
 	public String testing(String test) {
-		
-		//Needs to implement bleaching
 		
 		if(!getValid()) {
 			
@@ -135,42 +150,72 @@ public class WiSARD {
 		
 		StringBuilder value;
 		int l;
-		
-		int[] similarity = new int[mapa.size()];
-		
-		Iterator<Entry<String, Discriminator>> iterador = mapa.entrySet().iterator();
-		
-		while(iterador.hasNext()) {
-			
-			Entry<String, Discriminator> elemento = iterador.next();
-			
-			l = 0;
-			
-			for (int j = 0; j < elemento.getValue().getTuplas().size(); j = j + getTuples()) {
-				
-				value = new StringBuilder();
-				
-				for (int k = j; k < j + getTuples(); k++)
-					
-					value.append(test.charAt(mapa.get(elemento.getKey()).getTuplas().get(k)));
-				
-				if(mapa.get(elemento.getKey()).getRams().get(l).getMapa().get(value.toString()) != null)
-				
-					similarity[relacao2.get(elemento.getKey())]++;
-				
-				l++;
-			}
-		}
-		
 		int maxIndex = 0;
 		
-		for (int j = 1; j < similarity.length; j++) {
+		int b = 0;
+		
+		boolean draw = true;
+		
+		while(draw && b < getMaxBleaching()) {
+		
+			int[] similarity = new int[mapa.size()];
+		
+			Iterator<Entry<String, Discriminator>> iterador = mapa.entrySet().iterator();
+		
+			while(iterador.hasNext()) {
 			
+				Entry<String, Discriminator> elemento = iterador.next();
 			
-			if(similarity[j] > similarity[maxIndex]) {
+				l = 0;
+			
+				for (int j = 0; j < elemento.getValue().getTuplas().size(); j = j + getTuples()) {
 				
-				maxIndex = j;
+					value = new StringBuilder();
+				
+					for (int k = j; k < j + getTuples(); k++)
+					
+						value.append(test.charAt(mapa.get(elemento.getKey()).getTuplas().get(k)));
+				
+					if(mapa.get(elemento.getKey()).getRams().get(l).getMapa().get(value.toString()) != null ) {
+						
+						
+						
+						if(mapa.get(elemento.getKey()).getRams().get(l).getMapa().get(value.toString()) > b)
+							
+							similarity[relacao2.get(elemento.getKey())]++;
+				
+					}
+					
+					l++;
+				}
 			}
+		
+			maxIndex = 0;
+			int maxValue = similarity[0];
+			int occurrences = 0;
+		
+			for (int j = 1; j < similarity.length; j++) {
+			
+				if(similarity[j] > similarity[maxIndex]) {
+				
+					maxIndex = j;
+					maxValue = similarity[j];
+				
+					occurrences = 0;
+				}
+			
+				if(similarity[j] == maxValue)
+				
+					occurrences++;
+			}
+		
+			if(occurrences > 1) 
+			
+				b++;
+				
+			else
+			
+				draw = false;
 		}
 		
 		label = relacao1.get(maxIndex);

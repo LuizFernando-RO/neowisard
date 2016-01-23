@@ -26,20 +26,28 @@ public class MNIST {
 		startTime = System.nanoTime();
 		
 		WiSARD w1 = new WiSARD("w1", 28,28,28);
-		WiSARD w2 = new WiSARD("w2", 28,28,28);
+		
+		train(w1, 60000, "Input/MNIST/training.csv");
+		test(w1, 10000, "Input/MNIST/testing.csv");
+		
+		//WiSARD w2 = new WiSARD("w2", 28,28,28);
 		
 		//autoTraining(w1, w2);
 		//randomTraining(w1, w2);
 		
-		splitTotalSplittedFiles();
-		balancedTraining(w1, w2);
+		//splitTotalSplittedFiles();
+		//balancedTraining(w1, w2);
 		
-		test(w1, 10000, "Input/MNIST/Original/testing.csv");
-		test(w2, 10000, "Input/MNIST/Original/testing.csv");
+		//test(w1, 10000, "Input/MNIST/Original/testing.csv");
+		//test(w2, 10000, "Input/MNIST/Original/testing.csv");
+		
+		w1.mentalImage("1");
 		
 		w1.mentalImage("3");
 		
-		w2.mentalImage("3");
+		w1.mentalImage("7");
+		
+		//w2.mentalImage("3");
 		
 		endTime = System.nanoTime();
 		
@@ -68,7 +76,7 @@ public class MNIST {
 			br = new BufferedReader(fr);
 		
 			for(int i = 0; i < trainingSize; i++) {
-			
+				
 				example = new StringBuilder();
 				
 				splitter = br.readLine().trim().split(",");
@@ -100,12 +108,14 @@ public class MNIST {
 			System.out.println("Error!");
 		}
 		
-		System.out.println("\n-- Training phase finished successfully --");
+		System.out.println("Max Bleaching = " + w1.getMaxBleaching());
+		
+		System.out.println("\n-- Training phase finished successfully --\n");
 	}
 	
 	public static void test(WiSARD w1, int testingSize, String path) {
 		
-		System.out.println("-- Initializing testing phase --");
+		System.out.println("-- Initializing testing phase --\n");
 		
 		int m = 28;
 		
@@ -126,7 +136,7 @@ public class MNIST {
 			br = new BufferedReader(fr);
 		
 			for(int i = 0; i < testingSize; i++) {
-			
+				
 				example = new StringBuilder();
 				
 				splitter = br.readLine().trim().split(",");
@@ -162,7 +172,7 @@ public class MNIST {
 			System.out.println("Error!");
 		}
 		
-		System.out.println(counter + " / " + testingSize + " : " + ((float) counter / testingSize) + "%");
+		System.out.println("Accuracy: " + counter + " / " + testingSize + " : " + (((float) counter / testingSize) * 100 ) + "%");
 		
 		System.out.println("\n-- Testing phase finished successfully --");
 	}
