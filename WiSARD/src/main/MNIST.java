@@ -28,7 +28,7 @@ public class MNIST {
 		WiSARD w1 = new WiSARD("w1", 28,28,28);
 		
 		train(w1, 60000, "Input/MNIST/training.csv");
-		test(w1, 10000, "Input/MNIST/testing.csv");
+		test(w1, 100, "Input/MNIST/testing.csv");
 		
 		//WiSARD w2 = new WiSARD("w2", 28,28,28);
 		
@@ -41,11 +41,16 @@ public class MNIST {
 		//test(w1, 10000, "Input/MNIST/Original/testing.csv");
 		//test(w2, 10000, "Input/MNIST/Original/testing.csv");
 		
+		w1.mentalImage("0");
 		w1.mentalImage("1");
-		
+		w1.mentalImage("2");
 		w1.mentalImage("3");
-		
+		w1.mentalImage("4");
+		w1.mentalImage("5");
+		w1.mentalImage("6");
 		w1.mentalImage("7");
+		w1.mentalImage("8");
+		w1.mentalImage("9");
 		
 		//w2.mentalImage("3");
 		

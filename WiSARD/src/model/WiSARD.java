@@ -1,8 +1,19 @@
 package model;
 
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 public class WiSARD {
 	
@@ -257,6 +268,7 @@ public class WiSARD {
 		System.out.println("This is what I understand of a '" + label + "':\n\n");
 		
 		int acc = 0;
+		int maxValue = -1, minValue = getMaxBleaching();
 		
 		for(int i = 0; i < getWidth(); i++) {
 			
@@ -264,13 +276,21 @@ public class WiSARD {
 				
 				acc += image[i*getWidth()+j];
 				
-				System.out.print(image[i*getWidth()+j] + "\t");
+				if(image[i*getWidth()+j] > maxValue)
+					
+					maxValue = image[i*getWidth()+j];
+				
+				if(image[i*getWidth()+j] < minValue)
+					
+					minValue = image[i*getWidth()+j];
+				
+				//System.out.print(image[i*getWidth()+j] + "\t");
 			}
 			
-			System.out.println();
+			//System.out.println();
 		}
 		
-		System.out.println("The mean is " + (acc / (getWidth()*getHeight())) + ". Now I'm gonna use this as threshold for you to recognize it..." );
+		//System.out.println("The mean is " + (acc / (getWidth()*getHeight())) + ". Now I'm gonna use this as threshold for you to recognize it..." );
 		
 		for(int i = 0; i < getWidth(); i++) {
 			
@@ -287,6 +307,36 @@ public class WiSARD {
 			
 			System.out.println();
 		}
+		
+		BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+		
+		for (int x = 0; x < img.getWidth(); x++) {
+		    for (int y = 0; y < img.getHeight(); y++)
+		    {
+		        int grayLevel = (int) ( 0 + ( 255 * ( (double) (image[x*getWidth()+y] - minValue) / (maxValue - minValue) ) ) );
+		        
+		        //System.out.println(x*getWidth()+y + " - " + (int) ( 0 + ( 255 * ( (double) (image[x*getWidth()+y] - minValue) / (maxValue - minValue) ) ) ));
+		        
+		        int gray = (grayLevel << 16) + (grayLevel << 8) + grayLevel;
+		        img.setRGB( y, x, gray);
+		    }
+		}
+		
+		ImageIcon icon = new ImageIcon(img);
+		
+		Image newImg = icon.getImage();
+		Image bigImg = newImg.getScaledInstance(10*img.getWidth(), 10*img.getHeight(),  java.awt.Image.SCALE_SMOOTH);
+		ImageIcon newIcon = new ImageIcon(bigImg);
+				
+        JFrame frame = new JFrame();
+        frame.setLayout(new FlowLayout());
+        frame.setSize(10*img.getWidth()+50,10*img.getHeight()+50);
+        JLabel lbl = new JLabel();
+        lbl.setIcon(newIcon);
+        frame.add(lbl);
+        frame.setVisible(true);
+        //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   
+		
 	}
 	
 	@Override
