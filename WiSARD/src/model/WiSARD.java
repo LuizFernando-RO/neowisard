@@ -3,10 +3,10 @@ package model;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -14,13 +14,15 @@ import javax.swing.JLabel;
 
 public class WiSARD {
 	
-	private String name;
-	
-	private int height;
-	private int width;
-	
 	private int tuples;
 	private int rams;
+	
+	// Identification
+	private String name;
+	
+	// Retina size
+	private int height;
+	private int width;
 	
 	// Maximum bleaching is given by the highest value stored into some RAM slot
 	private int maxBleaching;
@@ -28,7 +30,11 @@ public class WiSARD {
 	// Mapping between the pattern and it's discriminator
 	private HashMap<String, Discriminator> map;
 	
+	// Set of mental images
 	private HashMap<String, int[]> mentalImage;
+	
+	// Synthetic training set
+	private HashMap<String, int[][]> syntethicTrainingSet;
 	
 	// Mapping between the learned label and it's order of presentation
 	private HashMap<Integer, String> rel1 = new HashMap<Integer, String>();
@@ -54,6 +60,7 @@ public class WiSARD {
 		
 			this.map = new HashMap<String, Discriminator>();
 			this.mentalImage = new HashMap<String, int[]>();
+			this.syntethicTrainingSet = new HashMap<String, int[][]>();
 			this.rel1 = new HashMap<Integer, String>();
 			this.rel2 = new HashMap<String, Integer>();
 		
@@ -99,9 +106,13 @@ public class WiSARD {
 	public int getMaxBleaching() {
 		return this.maxBleaching;
 	}
-
+	
 	public HashMap<String, int[]> getMentalImage() {
 		return this.mentalImage;
+	}
+	
+	public HashMap<String, int[][]> getSyntheticTrainingSet() {
+		return this.syntethicTrainingSet;
 	}
 	
 	// Domain
@@ -262,6 +273,8 @@ public class WiSARD {
 			Discriminator d = map.get(label);
 			RAM r;
 			
+			int maxValue = -1, minValue = getMaxBleaching();
+			
 			for(int i = 0; i < d.getnRams(); i++) {
 				
 				r = d.getRams().get(i);
@@ -279,6 +292,29 @@ public class WiSARD {
 				}			
 			}
 			
+			for(int i = 0; i < getWidth(); i++) {
+				
+				for (int j = 0; j < getHeight(); j++) {
+					
+					if(image[i*getWidth()+j] > maxValue)
+						
+						maxValue = image[i*getWidth()+j];
+					
+					if(image[i*getWidth()+j] < minValue)
+						
+						minValue = image[i*getWidth()+j];
+				}
+			}
+			
+			for(int i = 0; i < getWidth(); i++) {
+				
+				for (int j = 0; j < getHeight(); j++) {
+			
+					image[i*getWidth()+j] = (int) ( 0 + ( 255 * ( (double) (image[i*getWidth()+j] - minValue) / (maxValue - minValue) ) ) );
+			
+				}
+			}
+			
 			getMentalImage().put(label, image);
 		}
 	}
@@ -294,57 +330,12 @@ public class WiSARD {
 		
 		int[] image = getMentalImage().get(label);
 		
-		//System.out.println("This is what I understand of a '" + label + "':\n\n");
-		
-		//int acc = 0;
-		int maxValue = -1, minValue = getMaxBleaching();
-		
-		for(int i = 0; i < getWidth(); i++) {
-			
-			for (int j = 0; j < getHeight(); j++) {
-				
-				//acc += image[i*getWidth()+j];
-				
-				if(image[i*getWidth()+j] > maxValue)
-					
-					maxValue = image[i*getWidth()+j];
-				
-				if(image[i*getWidth()+j] < minValue)
-					
-					minValue = image[i*getWidth()+j];
-				
-				//System.out.print(image[i*getWidth()+j] + "\t");
-			}
-			
-			//System.out.println();
-		}
-		
-		//System.out.println("The mean is " + (acc / (getWidth()*getHeight())) + ". Now I'm gonna use this as threshold for you to recognize it..." );
-		
-		/*
-		for(int i = 0; i < getWidth(); i++) {
-			
-			for (int j = 0; j < getHeight(); j++) {
-				
-				if(image[i*getWidth()+j] < (acc / (getWidth()*getHeight())) )
-				
-					System.out.print("0");
-				
-				else
-					
-					System.out.print("1");
-			}
-			
-			System.out.println();
-		}
-		*/
-		
 		BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
 		
 		for (int x = 0; x < img.getWidth(); x++) {
 		    for (int y = 0; y < img.getHeight(); y++)
 		    {
-		        int grayLevel = (int) ( 0 + ( 255 * ( (double) (image[x*getWidth()+y] - minValue) / (maxValue - minValue) ) ) );
+		        int grayLevel = image[x*getWidth()+y];
 		        
 		        int gray = (grayLevel << 16) + (grayLevel << 8) + grayLevel;
 		        img.setRGB( y, x, gray);
@@ -370,6 +361,56 @@ public class WiSARD {
 	
 	public void syntheticTrainingSet() {
 		
+		Iterator<Entry<String, int[]>> iterator = getMentalImage().entrySet().iterator();
+		
+		while(iterator.hasNext()) {
+			
+			Entry<String, int[]> element = iterator.next();
+			
+			int[] image = element.getValue();
+			
+			int maxValue = image[0];
+			
+			for(int i = 1; i < image.length; i++) {
+				
+				if(image[i] > maxValue)
+					
+					maxValue = image[i];
+			}
+			
+			int[][] syntheticSet = new int[maxValue][image.length];
+			
+			Random random = new Random();
+			int index, swap;
+			
+			for(int i = 0; i < image.length; i++) {
+				
+				int[] aux = new int[maxValue];
+				
+				for(int j = 0; j < image[i]; j++) {
+					
+					aux[j] = 1;
+				}
+				
+				for(int j = 0; j < maxValue; j++) {
+					
+					index = random.nextInt(maxValue);
+					
+					swap = aux[j];
+					aux[j] = aux[index];
+					aux[index] = swap;
+				}
+				
+				for(int j = 0; j < maxValue; j++) {
+					
+					if(aux[j] == 1)
+						
+						syntheticSet[j][i] = 1;
+				}
+			}
+			
+			getSyntheticTrainingSet().put(element.getKey(), syntheticSet);
+		}
 	}
 	
 	public int getNumberOfPatterns() {

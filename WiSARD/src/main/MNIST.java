@@ -39,7 +39,16 @@ public class MNIST {
 		train(w1, 60000, "Input/MNIST/training.csv");
 		test(w1, 10000, "Input/MNIST/testing.csv");
 		w1.generateMentalImages();
+		w1.syntheticTrainingSet();
 		
+		int[][] teste = w1.getSyntheticTrainingSet().get("0");
+		
+		for(int j = 0; j < teste[0].length; j++) {
+			System.out.print(teste[0][j]);
+		}
+		
+		
+		/*
 		w1.mentalImage("0");
 		w1.mentalImage("1");
 		w1.mentalImage("2");
@@ -49,7 +58,7 @@ public class MNIST {
 		w1.mentalImage("6");
 		w1.mentalImage("7");
 		w1.mentalImage("8");
-		w1.mentalImage("9");
+		w1.mentalImage("9");*/
 	}
 	
 	public static void train(WiSARD w1, int trainingSize, String path) {
