@@ -25,21 +25,20 @@ public class MNIST {
 		
 		startTime = System.nanoTime();
 		
+		one();
+		
+		endTime = System.nanoTime();
+		
+		System.out.println("\n-- Execution time: " + duration() + "ms --");
+	}
+	
+	public static void one() {
+		
 		WiSARD w1 = new WiSARD("w1", 28,28,28);
 		
 		train(w1, 60000, "Input/MNIST/training.csv");
-		test(w1, 100, "Input/MNIST/testing.csv");
-		
-		//WiSARD w2 = new WiSARD("w2", 28,28,28);
-		
-		//autoTraining(w1, w2);
-		//randomTraining(w1, w2);
-		
-		//splitTotalSplittedFiles();
-		//balancedTraining(w1, w2);
-		
-		//test(w1, 10000, "Input/MNIST/Original/testing.csv");
-		//test(w2, 10000, "Input/MNIST/Original/testing.csv");
+		test(w1, 10000, "Input/MNIST/testing.csv");
+		w1.generateMentalImages();
 		
 		w1.mentalImage("0");
 		w1.mentalImage("1");
@@ -51,12 +50,6 @@ public class MNIST {
 		w1.mentalImage("7");
 		w1.mentalImage("8");
 		w1.mentalImage("9");
-		
-		//w2.mentalImage("3");
-		
-		endTime = System.nanoTime();
-		
-		System.out.println("\n-- Execution time: " + duration() + "ms --");
 	}
 	
 	public static void train(WiSARD w1, int trainingSize, String path) {
@@ -460,6 +453,7 @@ public class MNIST {
 		}
 	}
 	
+	// Computes the time spent
 	public static long duration() {
 		
 		return  TimeUnit.NANOSECONDS.toMillis(endTime) - TimeUnit.NANOSECONDS.toMillis(startTime);

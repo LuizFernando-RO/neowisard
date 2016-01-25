@@ -1,16 +1,13 @@
 package model;
 
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,13 +22,22 @@ public class WiSARD {
 	private int tuples;
 	private int rams;
 	
+	// Maximum bleaching is given by the highest value stored into some RAM slot
 	private int maxBleaching;
 	
-	private HashMap<String, Discriminator> mapa;
-	private HashMap<Integer, String> relacao1 = new HashMap<Integer, String>();
-	private HashMap<String, Integer> relacao2 = new HashMap<String, Integer>();
+	// Mapping between the pattern and it's discriminator
+	private HashMap<String, Discriminator> map;
 	
+	private HashMap<String, int[]> mentalImage;
+	
+	// Mapping between the learned label and it's order of presentation
+	private HashMap<Integer, String> rel1 = new HashMap<Integer, String>();
+	private HashMap<String, Integer> rel2 = new HashMap<String, Integer>();
+	
+	// Checks for valid WiSARD configuration
 	boolean valid;
+	
+	//Constructors
 	
 	public WiSARD(String name, int height, int width, int tuples) {
 		
@@ -45,18 +51,21 @@ public class WiSARD {
 		else {
 			
 			this.valid = true;
+		
+			this.map = new HashMap<String, Discriminator>();
+			this.mentalImage = new HashMap<String, int[]>();
+			this.rel1 = new HashMap<Integer, String>();
+			this.rel2 = new HashMap<String, Integer>();
+		
+			this.name = name;
+			this.height = height;
+			this.width = width;
+			this.tuples = tuples;
+			this.rams = height * width / tuples;
 		}
-		
-		this.mapa = new HashMap<String, Discriminator>();
-		this.relacao1 = new HashMap<Integer, String>();
-		this.relacao2 = new HashMap<String, Integer>();
-		
-		this.name = name;
-		this.height = height;
-		this.width = width;
-		this.tuples = tuples;
-		this.rams = height * width / tuples;
 	}
+	
+	// Getters and Setters
 	
 	public String getName() {
 		return this.name;
@@ -78,10 +87,6 @@ public class WiSARD {
 		return this.width;
 	}
 	
-	public int numberOfPatterns() {
-		return this.mapa.size();
-	}
-	
 	public boolean getValid() {
 		return this.valid;
 	}
@@ -94,6 +99,12 @@ public class WiSARD {
 	public int getMaxBleaching() {
 		return this.maxBleaching;
 	}
+
+	public HashMap<String, int[]> getMentalImage() {
+		return this.mentalImage;
+	}
+	
+	// Domain
 	
 	public void training(String label, String example ) {
 		
@@ -107,40 +118,40 @@ public class WiSARD {
 		StringBuilder value;
 		int l;
 		
-		if(mapa.get(label) == null) {
+		if(map.get(label) == null) {
 			
 			System.out.println("New pattern: '" + label + "' learned");
 			
 			Discriminator discriminator = new Discriminator(getRams(), getTuples());
 			discriminator.setId(label);
 			
-			mapa.put(label, discriminator);
+			map.put(label, discriminator);
 			
-			relacao1.put(relacao1.size(), label);
-			relacao2.put(label, relacao2.size());
+			rel1.put(rel1.size(), label);
+			rel2.put(label, rel2.size());
 		}
 		
 		l = 0;
 		
-		for (int j = 0; j < mapa.get(label).getTuplas().size(); j = j + getTuples()) {
+		for (int j = 0; j < map.get(label).getTuplas().size(); j = j + getTuples()) {
 			
 			value = new StringBuilder();
 			
 			for (int k = j; k < j + getTuples(); k++)
 				
-				value.append(example.charAt(mapa.get(label).getTuplas().get(k))) ;
+				value.append(example.charAt(map.get(label).getTuplas().get(k))) ;
 			
-			if(mapa.get(label).getRams().get(l).getMapa().get(value.toString()) == null) 
+			if(map.get(label).getRams().get(l).getMapa().get(value.toString()) == null) 
 			
-				mapa.get(label).getRams().get(l).getMapa().put(value.toString(), 1);
+				map.get(label).getRams().get(l).getMapa().put(value.toString(), 1);
 			
 			else {
 				
-				mapa.get(label).getRams().get(l).getMapa().put(value.toString(), mapa.get(label).getRams().get(l).getMapa().get(value.toString()) + 1);
+				map.get(label).getRams().get(l).getMapa().put(value.toString(), map.get(label).getRams().get(l).getMapa().get(value.toString()) + 1);
 			
-				if(mapa.get(label).getRams().get(l).getMapa().get(value.toString()) > getMaxBleaching()) {
+				if(map.get(label).getRams().get(l).getMapa().get(value.toString()) > getMaxBleaching()) {
 					
-					setMaxBleaching(mapa.get(label).getRams().get(l).getMapa().get(value.toString()));
+					setMaxBleaching(map.get(label).getRams().get(l).getMapa().get(value.toString()));
 				}
 			}
 			
@@ -169,9 +180,9 @@ public class WiSARD {
 		
 		while(draw && b < getMaxBleaching()) {
 		
-			int[] similarity = new int[mapa.size()];
+			int[] similarity = new int[map.size()];
 		
-			Iterator<Entry<String, Discriminator>> iterador = mapa.entrySet().iterator();
+			Iterator<Entry<String, Discriminator>> iterador = map.entrySet().iterator();
 		
 			while(iterador.hasNext()) {
 			
@@ -185,15 +196,15 @@ public class WiSARD {
 				
 					for (int k = j; k < j + getTuples(); k++)
 					
-						value.append(test.charAt(mapa.get(elemento.getKey()).getTuplas().get(k)));
+						value.append(test.charAt(map.get(elemento.getKey()).getTuplas().get(k)));
 				
-					if(mapa.get(elemento.getKey()).getRams().get(l).getMapa().get(value.toString()) != null ) {
+					if(map.get(elemento.getKey()).getRams().get(l).getMapa().get(value.toString()) != null ) {
 						
 						
 						
-						if(mapa.get(elemento.getKey()).getRams().get(l).getMapa().get(value.toString()) > b)
+						if(map.get(elemento.getKey()).getRams().get(l).getMapa().get(value.toString()) > b)
 							
-							similarity[relacao2.get(elemento.getKey())]++;
+							similarity[rel2.get(elemento.getKey())]++;
 				
 					}
 					
@@ -229,52 +240,70 @@ public class WiSARD {
 				draw = false;
 		}
 		
-		label = relacao1.get(maxIndex);
+		label = rel1.get(maxIndex);
 		
 		return label;
 	}
 	
+	public void generateMentalImages() {
+		
+		String label;
+		
+		Iterator<Entry<String, Integer>> it1 = rel2.entrySet().iterator();
+		
+		while(it1.hasNext()) {
+		
+			Entry<String, Integer> el1 = it1.next();
+			
+			label = el1.getKey();
+			
+			int[] image = new int[getHeight() * getWidth()];
+			
+			Discriminator d = map.get(label);
+			RAM r;
+			
+			for(int i = 0; i < d.getnRams(); i++) {
+				
+				r = d.getRams().get(i);
+				
+				Iterator<Entry<String, Integer>> iterator = r.getMapa().entrySet().iterator();
+				
+				while(iterator.hasNext()) {
+					
+					Entry<String, Integer> element = iterator.next();
+					
+					for(int j = 0; j < getTuples(); j++ ) 
+						
+						image[d.getTuplas().get(i*getTuples()+j)] += Integer.valueOf(element.getKey().charAt(j) - '0') * element.getValue();
+					
+				}			
+			}
+			
+			getMentalImage().put(label, image);
+		}
+	}
+	
 	public void mentalImage(String label) {
 		
-		if(mapa.get(label) == null) {
+		if(map.get(label) == null) {
 			
 			System.out.println("Sorry, but I don't know what you are talking about...");
 			
 			return;
 		}
 		
-		int[] image = new int[getHeight() * getWidth()];
+		int[] image = getMentalImage().get(label);
 		
-		Discriminator d = mapa.get(label);
-		RAM r;
+		//System.out.println("This is what I understand of a '" + label + "':\n\n");
 		
-		for(int i = 0; i < d.getnRams(); i++) {
-			
-			r = d.getRams().get(i);
-			
-			Iterator<Entry<String, Integer>> iterator = r.getMapa().entrySet().iterator();
-			
-			while(iterator.hasNext()) {
-				
-				Entry<String, Integer> element = iterator.next();
-				
-				for(int j = 0; j < getTuples(); j++ ) 
-					
-					image[d.getTuplas().get(i*getTuples()+j)] += Integer.valueOf(element.getKey().charAt(j) - '0') * element.getValue();
-				
-			}			
-		}
-		
-		System.out.println("This is what I understand of a '" + label + "':\n\n");
-		
-		int acc = 0;
+		//int acc = 0;
 		int maxValue = -1, minValue = getMaxBleaching();
 		
 		for(int i = 0; i < getWidth(); i++) {
 			
 			for (int j = 0; j < getHeight(); j++) {
 				
-				acc += image[i*getWidth()+j];
+				//acc += image[i*getWidth()+j];
 				
 				if(image[i*getWidth()+j] > maxValue)
 					
@@ -292,6 +321,7 @@ public class WiSARD {
 		
 		//System.out.println("The mean is " + (acc / (getWidth()*getHeight())) + ". Now I'm gonna use this as threshold for you to recognize it..." );
 		
+		/*
 		for(int i = 0; i < getWidth(); i++) {
 			
 			for (int j = 0; j < getHeight(); j++) {
@@ -307,6 +337,7 @@ public class WiSARD {
 			
 			System.out.println();
 		}
+		*/
 		
 		BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
 		
@@ -314,8 +345,6 @@ public class WiSARD {
 		    for (int y = 0; y < img.getHeight(); y++)
 		    {
 		        int grayLevel = (int) ( 0 + ( 255 * ( (double) (image[x*getWidth()+y] - minValue) / (maxValue - minValue) ) ) );
-		        
-		        //System.out.println(x*getWidth()+y + " - " + (int) ( 0 + ( 255 * ( (double) (image[x*getWidth()+y] - minValue) / (maxValue - minValue) ) ) ));
 		        
 		        int gray = (grayLevel << 16) + (grayLevel << 8) + grayLevel;
 		        img.setRGB( y, x, gray);
@@ -335,8 +364,16 @@ public class WiSARD {
         lbl.setIcon(newIcon);
         frame.add(lbl);
         frame.setVisible(true);
-        //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   
 		
+	}
+	
+	public void syntheticTrainingSet() {
+		
+	}
+	
+	public int getNumberOfPatterns() {
+		return this.map.size();
 	}
 	
 	@Override
@@ -347,19 +384,19 @@ public class WiSARD {
 		
 		presentation += "I'm supposed to see a " + getHeight() + " x " + getWidth() + " retina.\n\n";
 		
-		if(numberOfPatterns() == 0)
+		if(getNumberOfPatterns() == 0)
 		
 			presentation += "Currently, I recognize no patterns. I can't wait to start learning!\n\n";
 		
-		else if(numberOfPatterns() == 1)
+		else if(getNumberOfPatterns() == 1)
 			
-			presentation += "Currently, I recognize " + numberOfPatterns() + " pattern, described as follows:\n\n";
+			presentation += "Currently, I recognize " + getNumberOfPatterns() + " pattern, described as follows:\n\n";
 		
 		else
 			
-			presentation += "Currently, I recognize " + numberOfPatterns() + " patterns, described as follows:\n\n";
+			presentation += "Currently, I recognize " + getNumberOfPatterns() + " patterns, described as follows:\n\n";
 		
-		Iterator<Entry<String, Discriminator>> iterador = mapa.entrySet().iterator();
+		Iterator<Entry<String, Discriminator>> iterador = map.entrySet().iterator();
 		
 		while(iterador.hasNext()) {
 			
