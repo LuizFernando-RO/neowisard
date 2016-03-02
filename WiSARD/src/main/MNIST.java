@@ -21,11 +21,14 @@ public class MNIST {
 	public static long startTime;
 	public static long endTime;
 	
+	public static int index = 0;
+	public static ArrayList<String> combinations = new ArrayList<String>();
+	
 	public static void main(String[] args) {
 		
 		startTime = System.nanoTime();
 		
-		one();
+		two();
 		
 		endTime = System.nanoTime();
 		
@@ -36,8 +39,8 @@ public class MNIST {
 		
 		WiSARD w1 = new WiSARD("w1", 28,28,28);
 		
-		train(w1, 60000, "Input/MNIST/training.csv");
-		test(w1, 10000, "Input/MNIST/testing.csv");
+		train(w1, 60000, "Input/MNIST/Original/training.csv");
+		test(w1, 10000, "Input/MNIST/Original/testing.csv");
 		w1.generateMentalImages();
 		w1.syntheticTrainingSet();
 		
@@ -47,6 +50,11 @@ public class MNIST {
 			System.out.print(teste[0][j]);
 		}
 		
+		System.out.println();
+		
+		for(int j = 0; j < teste[0].length; j++) {
+			System.out.print(teste[1][j]);
+		}
 		
 		/*
 		w1.mentalImage("0");
@@ -59,6 +67,182 @@ public class MNIST {
 		w1.mentalImage("7");
 		w1.mentalImage("8");
 		w1.mentalImage("9");*/
+	}
+	
+	public static void two() {
+		
+		int m = 28;
+		
+		StringBuilder example;
+		String[] splitter;
+		
+		String path = "Input/MNIST/Original/training.csv";
+		int trainingSize = 60000;
+		
+		File f;
+		FileReader fr;
+		BufferedReader br;
+
+		//Load the training file
+		
+		String[] trainingSet = new String[60000];
+		
+		f = new File(path);
+		
+		try {
+			
+			fr = new FileReader(f);
+			br = new BufferedReader(fr);
+		
+			for(int i = 0; i < trainingSize; i++) {
+				
+				example = new StringBuilder();
+				
+				splitter = br.readLine().trim().split(",");
+				
+				example.append(splitter[0]);
+				
+				for(int j = 1; j < m*m + 1; j++) {
+					
+					if(Integer.valueOf(splitter[j]) > 0)
+						
+						example.append("1");
+					
+					else
+						
+						example.append("0");
+				}
+				
+				trainingSet[i] = example.toString();
+			}
+			
+			br.close();
+			
+		} catch (FileNotFoundException e) {
+			
+			System.out.println("File not found!");
+			
+		} catch (IOException e) {
+			
+			System.out.println("Error!");
+		}
+		
+		System.out.println("Training set loaded successfully!");
+		
+		// Dividing into 6 blocks of 10k test samples and 50k training samples
+		
+		allCombinations(new StringBuilder(), 5, 5, 10);
+		
+		for(int i = 0; i < 6; i++) {
+			
+			System.out.println("Block " + i);
+			
+			int testStart = i * 10000;
+			int testEnd = (i+1) * 10000;
+			
+			for (int j = 0; j < 252; j++) {
+				
+				System.out.println("Environment " + j);
+				
+				String combination = combinations.get(j);
+				
+				int combinationIndex = 0;
+				
+				ArrayList<String> testSet = new ArrayList<String>();
+				ArrayList<String> trainSet1 = new ArrayList<String>();
+				ArrayList<String> trainSet2 = new ArrayList<String>();
+				
+				for (int k = 0; k < 60000; k++) {
+					
+					//Test set
+					if(k >= testStart && k < testEnd) {
+						
+						testSet.add(trainingSet[k]);
+					}
+					
+					// Training set
+					else {
+						
+						// Training for first WiSARD
+						if(Integer.valueOf(combination.charAt(combinationIndex) - '0') == 1) 
+							
+							trainSet1.add(trainingSet[k]);
+						
+						// Training for second WiSARD
+						else
+							
+							trainSet2.add(trainingSet[k]);
+						
+						if( k % 5000 == 0 && k != testEnd && k > 0) {
+							
+							combinationIndex++;
+						}		
+					}
+				}
+				
+				f = new File("Input/MNIST/CrossValidation/Block" + i + "/env" + j + ".txt");
+				FileWriter fw;
+				BufferedWriter bw;
+				
+				try {
+					
+					fw = new FileWriter(f);
+					
+					bw = new BufferedWriter(fw);
+					
+					//bw.write("w1\n");
+					
+					for(int k = 0; k < trainSet1.size(); k++) 
+					
+						bw.write(trainSet1.get(k) + "\n");
+					
+					//bw.write("w2\n");
+					
+					for(int k = 0; k < trainSet2.size(); k++) 
+						
+						bw.write(trainSet2.get(k) + "\n");
+					
+					//bw.write("test\n");
+					
+					for(int k = 0; k < testSet.size(); k++) 
+						
+						bw.write(testSet.get(k) + "\n");
+					
+					bw.close();
+					
+				} catch (FileNotFoundException e) {
+					
+					System.out.println("File not found!");
+				} catch (IOException e) {
+					
+					System.out.println("Error!");
+				}
+			}			
+		}
+	}
+	
+	public static void allCombinations(StringBuilder combination, int set1, int set2, int limit) {
+		
+		if(combination.length() == limit) {
+			//System.out.println("Combination " + index + " - " + combination.toString());
+			combinations.add(combination.toString());
+			index++;
+		}
+		else {
+			if(set1 > 0) {
+				StringBuilder b1 = new StringBuilder();
+				b1.append(combination.toString());
+				b1.append("1");
+				allCombinations(b1, set1 - 1, set2, limit);
+			}
+			
+			if(set2 > 0) {
+				StringBuilder b2 = new StringBuilder();
+				b2.append(combination.toString());
+				b2.append("0");
+				allCombinations(b2, set1, set2 - 1, limit);				
+			}
+		}
 	}
 	
 	public static void train(WiSARD w1, int trainingSize, String path) {
