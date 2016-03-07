@@ -117,7 +117,7 @@ public class WiSARD {
 	
 	// Domain
 	
-	public void training(String label, String example ) {
+	public void train(String label, String example ) {
 		
 		if(!getValid()) {
 			
@@ -131,7 +131,7 @@ public class WiSARD {
 		
 		if(map.get(label) == null) {
 			
-			System.out.println("New pattern: '" + label + "' learned");
+			//System.out.println("New pattern: '" + label + "' learned");
 			
 			Discriminator discriminator = new Discriminator(getRams(), getTuples());
 			discriminator.setId(label);
@@ -170,7 +170,7 @@ public class WiSARD {
 		}
 	}
 	
-	public String testing(String test) {
+	public String test(String test) {
 		
 		if(!getValid()) {
 			

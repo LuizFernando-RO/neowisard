@@ -86,7 +86,7 @@ public class OptDigits {
 						example.append("0");
 				}
 				
-				w1.training(label, example.toString());
+				w1.train(label, example.toString());
 			}
 			
 			br.close();
@@ -144,7 +144,7 @@ public class OptDigits {
 						example.append("0");
 				}
 				
-				result = w1.testing(example.toString());
+				result = w1.test(example.toString());
 				
 				if(result.equals(label))
 					
