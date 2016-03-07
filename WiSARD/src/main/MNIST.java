@@ -28,8 +28,8 @@ public class MNIST {
 		
 		startTime = System.nanoTime();
 		
-		//two();
-		three();
+		two();
+		//three();
 		
 		endTime = System.nanoTime();
 		
@@ -135,7 +135,7 @@ public class MNIST {
 		
 		allCombinations(new StringBuilder(), 5, 5, 10);
 		
-		for(int i = 0; i < 1; i++) {
+		for(int i = 1; i < 6; i++) {
 			
 			System.out.println("Block " + i);
 			
@@ -243,17 +243,21 @@ public class MNIST {
 		
 		System.out.println("-- Initializing experiments --\n");
 		
+		WiSARD w0 = new WiSARD("w0", 28, 28, 28);
+		WiSARD w1 = new WiSARD("w1", 28, 28, 28);
+		WiSARD w01 = new WiSARD("w01", 28, 28, 28);
+		
 		for(int i = 0; i < 1; i++) {
-			
-			WiSARD w0 = new WiSARD("w0", 28, 28, 28);
-			WiSARD w1 = new WiSARD("w1", 28, 28, 28);
-			WiSARD w01 = new WiSARD("w01", 28, 28, 28);
 			
 			System.out.println("Block " + i);
 			
 			f1 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"Accuracy.txt");
 			
 			for (int j = 0; j < 252; j++) {
+				
+				w0.clear();
+				w1.clear();
+				w01.clear();
 				
 				System.out.println("Environment " + j);
 				

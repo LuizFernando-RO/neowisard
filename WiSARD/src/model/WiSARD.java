@@ -417,6 +417,15 @@ public class WiSARD {
 		return this.map.size();
 	}
 	
+	public void clear() {
+		
+		this.map = new HashMap<String, Discriminator>();
+		this.mentalImage = new HashMap<String, int[]>();
+		this.syntethicTrainingSet = new HashMap<String, int[][]>();
+		this.rel1 = new HashMap<Integer, String>();
+		this.rel2 = new HashMap<String, Integer>();
+	}
+	
 	@Override
 	public String toString() {
 		String presentation = "";
