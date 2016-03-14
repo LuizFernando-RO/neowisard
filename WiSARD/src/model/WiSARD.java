@@ -94,6 +94,14 @@ public class WiSARD {
 		return this.width;
 	}
 	
+	public HashMap<String, Discriminator> getMap() {
+		return this.map;
+	}
+	
+	public void setMap(HashMap<String, Discriminator> map) {
+		this.map = map;
+	}
+	
 	public boolean getValid() {
 		return this.valid;
 	}

@@ -433,6 +433,45 @@ public class MNIST {
 		System.out.println("-- Finish --\n");
 	}
 	
+	public static void crossZero() {
+		
+		/* Random Mapping configuration
+		 * Intra-environment: equal
+		 * Inter-environment: equal
+		 * */
+		
+		WiSARD w0 = new WiSARD("w0", 28, 28, 28);
+		WiSARD w1 = new WiSARD("w1", 28, 28, 28);
+		WiSARD w01 = new WiSARD("w01", 28, 28, 28);
+	
+		
+	}
+	
+	public static void crossOne() {
+		
+		/* Random Mapping configuration
+		 * Intra-environment: equal
+		 * Inter-environment: different
+		 * */
+	}
+	
+	public static void crossTwo() {
+		
+		/* Random Mapping configuration
+		 * Intra-environment: different
+		 * Inter-environment: equal
+		 * */
+	}
+	
+	public static void crossThree() {
+		
+		/* Random Mapping configuration
+		 * Intra-environment: different
+		 * Inter-environment: different
+		 * */
+		
+	}
+	
 	public static void allCombinations(StringBuilder combination, int set1, int set2, int limit) {
 		
 		if(combination.length() == limit) {
