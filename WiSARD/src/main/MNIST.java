@@ -14,6 +14,7 @@ import java.util.Random;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
+import model.Discriminator;
 import model.WiSARD;
 
 public class MNIST {
@@ -28,8 +29,10 @@ public class MNIST {
 		
 		startTime = System.nanoTime();
 		
-		two();
+		//two();
 		//three();
+		
+		crossZero();
 		
 		endTime = System.nanoTime();
 		
@@ -444,7 +447,227 @@ public class MNIST {
 		WiSARD w1 = new WiSARD("w1", 28, 28, 28);
 		WiSARD w01 = new WiSARD("w01", 28, 28, 28);
 	
+		System.out.println("-- Test Reference: 0 --\n");
 		
+		String[] labels = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+		
+		for (int i = 0; i < labels.length; i++) {
+			Discriminator discriminator = new Discriminator(28, 28);
+			discriminator.setId(labels[i]);
+			
+			w0.getMap().put(labels[i], discriminator);
+			w0.getRel1().put(w0.getRel1().size(), labels[i]);
+			w0.getRel2().put(labels[i], w0.getRel2().size());
+		}
+		
+		w1.setMap(w0.getMap());
+		w1.setRel1(w0.getRel1());
+		w1.setRel2(w0.getRel2());
+		
+		w01.setMap(w0.getMap());
+		w01.setRel1(w0.getRel1());
+		w01.setRel2(w0.getRel2());
+		
+		File f1, f2, f3;
+		FileReader fr1;
+		BufferedReader br1;
+		
+		FileWriter fw1;
+		BufferedWriter bw1;
+		
+		StringBuilder example;
+		String[] splitter;
+		
+		String label;
+		
+		int c0, c1, c01;
+		
+		System.out.println("-- Initializing experiments --\n");
+		
+		for(int i = 0; i < 1; i++) {
+			
+			System.out.println("Block " + i);
+			
+			f1 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"Accuracy.txt");
+			
+			for (int j = 0; j < 252; j++) {
+				
+				w0.clear();
+				w1.clear();
+				w01.clear();
+				
+				System.out.println("Environment " + j);
+				
+				f2 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"env"+j+"DM.txt");
+				f3 = new File("Input/MNIST/CrossValidation/Block"+i+"/env"+j+".txt");
+				
+				try {
+					
+					//System.out.println("-- Training --\n");
+					
+					fr1 = new FileReader(f3);
+					br1 = new BufferedReader(fr1);
+					
+					for (int k = 0; k < 25000; k++) {
+						
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						w0.train(splitter[0], example.toString());
+						w01.train(splitter[0], example.toString());
+					}
+					
+					for (int k = 25000; k < 50000; k++) {
+					
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						w1.train(splitter[0], example.toString());
+						w01.train(splitter[0], example.toString());
+					}
+
+					//System.out.println("-- Testing --\n");
+					
+					c0 = 0;
+					c1 = 0;
+					c01 = 0;
+					
+					for (int k = 50000; k < 60000; k++) {
+						
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						label = w0.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c0++;
+						}
+						
+						label = w1.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c1++;
+						}
+
+						label = w01.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c01++;
+						}
+					}
+					
+					fw1 = new FileWriter(f1, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					bw1.write(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) + "\n" );
+					
+					bw1.close();
+					
+					//System.out.println(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) );
+					
+					//System.out.println("-- Mental Images --\n");
+					
+					w0.generateMentalImages();
+					w1.generateMentalImages();
+					w01.generateMentalImages();
+					
+					fw1 = new FileWriter(f2, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					StringBuilder strB;
+					
+					Iterator<Entry<String, int[]>> iterator = w0.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+					
+					iterator = w1.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+					
+					iterator = w01.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+										
+					bw1.close();
+					
+				} catch (FileNotFoundException e) {
+					
+					e.printStackTrace();
+					
+				} catch (IOException e) {
+					
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		System.out.println("-- Finish --\n");
 	}
 	
 	public static void crossOne() {
@@ -453,6 +676,234 @@ public class MNIST {
 		 * Intra-environment: equal
 		 * Inter-environment: different
 		 * */
+		
+		System.out.println("-- Test Reference: 1 --\n");
+		
+		WiSARD w0 = new WiSARD("w0", 28, 28, 28);
+		WiSARD w1 = new WiSARD("w1", 28, 28, 28);
+		WiSARD w01 = new WiSARD("w01", 28, 28, 28);
+	
+		System.out.println("-- Test Reference: 0 --\n");
+		
+		String[] labels = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+		
+		for (int i = 0; i < labels.length; i++) {
+			Discriminator discriminator = new Discriminator(28, 28);
+			discriminator.setId(labels[i]);
+			
+			w0.getMap().put(labels[i], discriminator);
+			w0.getRel1().put(w0.getRel1().size(), labels[i]);
+			w0.getRel2().put(labels[i], w0.getRel2().size());
+		}
+		
+		w1.setMap(w0.getMap());
+		w1.setRel1(w0.getRel1());
+		w1.setRel2(w0.getRel2());
+		
+		w01.setMap(w0.getMap());
+		w01.setRel1(w0.getRel1());
+		w01.setRel2(w0.getRel2());
+		
+		File f1, f2, f3;
+		FileReader fr1;
+		BufferedReader br1;
+		
+		FileWriter fw1;
+		BufferedWriter bw1;
+		
+		StringBuilder example;
+		String[] splitter;
+		
+		String label;
+		
+		int c0, c1, c01;
+		
+		System.out.println("-- Initializing experiments --\n");
+		
+		for(int i = 0; i < 1; i++) {
+			
+			System.out.println("Block " + i);
+			
+			f1 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"Accuracy.txt");
+			
+			for (int j = 0; j < 252; j++) {
+				
+				w0.clear();
+				w1.clear();
+				w01.clear();
+				
+				System.out.println("Environment " + j);
+				
+				f2 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"env"+j+"DM.txt");
+				f3 = new File("Input/MNIST/CrossValidation/Block"+i+"/env"+j+".txt");
+				
+				try {
+					
+					//System.out.println("-- Training --\n");
+					
+					fr1 = new FileReader(f3);
+					br1 = new BufferedReader(fr1);
+					
+					for (int k = 0; k < 25000; k++) {
+						
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						w0.train(splitter[0], example.toString());
+						w01.train(splitter[0], example.toString());
+					}
+					
+					for (int k = 25000; k < 50000; k++) {
+					
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						w1.train(splitter[0], example.toString());
+						w01.train(splitter[0], example.toString());
+					}
+
+					//System.out.println("-- Testing --\n");
+					
+					c0 = 0;
+					c1 = 0;
+					c01 = 0;
+					
+					for (int k = 50000; k < 60000; k++) {
+						
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						label = w0.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c0++;
+						}
+						
+						label = w1.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c1++;
+						}
+
+						label = w01.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c01++;
+						}
+					}
+					
+					fw1 = new FileWriter(f1, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					bw1.write(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) + "\n" );
+					
+					bw1.close();
+					
+					//System.out.println(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) );
+					
+					//System.out.println("-- Mental Images --\n");
+					
+					w0.generateMentalImages();
+					w1.generateMentalImages();
+					w01.generateMentalImages();
+					
+					fw1 = new FileWriter(f2, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					StringBuilder strB;
+					
+					Iterator<Entry<String, int[]>> iterator = w0.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+					
+					iterator = w1.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+					
+					iterator = w01.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+										
+					bw1.close();
+					
+				} catch (FileNotFoundException e) {
+					
+					e.printStackTrace();
+					
+				} catch (IOException e) {
+					
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		System.out.println("-- Finish --\n");
 	}
 	
 	public static void crossTwo() {
@@ -461,6 +912,213 @@ public class MNIST {
 		 * Intra-environment: different
 		 * Inter-environment: equal
 		 * */
+		
+		System.out.println("-- Test Reference: 2 --\n");
+		
+		File f1, f2, f3;
+		FileReader fr1;
+		BufferedReader br1;
+		
+		FileWriter fw1;
+		BufferedWriter bw1;
+		
+		StringBuilder example;
+		String[] splitter;
+		
+		String label;
+		
+		int c0, c1, c01;
+		
+		System.out.println("-- Initializing experiments --\n");
+		
+		WiSARD w0 = new WiSARD("w0", 28, 28, 28);
+		WiSARD w1 = new WiSARD("w1", 28, 28, 28);
+		WiSARD w01 = new WiSARD("w01", 28, 28, 28);
+		
+		for(int i = 0; i < 1; i++) {
+			
+			System.out.println("Block " + i);
+			
+			f1 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"Accuracy.txt");
+			
+			for (int j = 0; j < 252; j++) {
+				
+				w0.clear();
+				w1.clear();
+				w01.clear();
+				
+				System.out.println("Environment " + j);
+				
+				f2 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"env"+j+"DM.txt");
+				f3 = new File("Input/MNIST/CrossValidation/Block"+i+"/env"+j+".txt");
+				
+				try {
+					
+					//System.out.println("-- Training --\n");
+					
+					fr1 = new FileReader(f3);
+					br1 = new BufferedReader(fr1);
+					
+					for (int k = 0; k < 25000; k++) {
+						
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						w0.train(splitter[0], example.toString());
+						w01.train(splitter[0], example.toString());
+					}
+					
+					for (int k = 25000; k < 50000; k++) {
+					
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						w1.train(splitter[0], example.toString());
+						w01.train(splitter[0], example.toString());
+					}
+
+					//System.out.println("-- Testing --\n");
+					
+					c0 = 0;
+					c1 = 0;
+					c01 = 0;
+					
+					for (int k = 50000; k < 60000; k++) {
+						
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						label = w0.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c0++;
+						}
+						
+						label = w1.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c1++;
+						}
+
+						label = w01.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c01++;
+						}
+					}
+					
+					fw1 = new FileWriter(f1, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					bw1.write(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) + "\n" );
+					
+					bw1.close();
+					
+					//System.out.println(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) );
+					
+					//System.out.println("-- Mental Images --\n");
+					
+					w0.generateMentalImages();
+					w1.generateMentalImages();
+					w01.generateMentalImages();
+					
+					fw1 = new FileWriter(f2, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					StringBuilder strB;
+					
+					Iterator<Entry<String, int[]>> iterator = w0.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+					
+					iterator = w1.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+					
+					iterator = w01.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+										
+					bw1.close();
+					
+				} catch (FileNotFoundException e) {
+					
+					e.printStackTrace();
+					
+				} catch (IOException e) {
+					
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		System.out.println("-- Finish --\n");
 	}
 	
 	public static void crossThree() {
@@ -470,6 +1128,208 @@ public class MNIST {
 		 * Inter-environment: different
 		 * */
 		
+		System.out.println("-- Test Reference: 3 --\n");
+		
+		File f1, f2, f3;
+		FileReader fr1;
+		BufferedReader br1;
+		
+		FileWriter fw1;
+		BufferedWriter bw1;
+		
+		StringBuilder example;
+		String[] splitter;
+		
+		String label;
+		
+		int c0, c1, c01;
+		
+		System.out.println("-- Initializing experiments --\n");
+		
+		for(int i = 0; i < 1; i++) {
+			
+			System.out.println("Block " + i);
+			
+			f1 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"Accuracy.txt");
+			
+			for (int j = 0; j < 252; j++) {
+				
+				WiSARD w0 = new WiSARD("w0", 28, 28, 28);
+				WiSARD w1 = new WiSARD("w1", 28, 28, 28);
+				WiSARD w01 = new WiSARD("w01", 28, 28, 28);
+				
+				System.out.println("Environment " + j);
+				
+				f2 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"env"+j+"DM.txt");
+				f3 = new File("Input/MNIST/CrossValidation/Block"+i+"/env"+j+".txt");
+				
+				try {
+					
+					//System.out.println("-- Training --\n");
+					
+					fr1 = new FileReader(f3);
+					br1 = new BufferedReader(fr1);
+					
+					for (int k = 0; k < 25000; k++) {
+						
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						w0.train(splitter[0], example.toString());
+						w01.train(splitter[0], example.toString());
+					}
+					
+					for (int k = 25000; k < 50000; k++) {
+					
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						w1.train(splitter[0], example.toString());
+						w01.train(splitter[0], example.toString());
+					}
+
+					//System.out.println("-- Testing --\n");
+					
+					c0 = 0;
+					c1 = 0;
+					c01 = 0;
+					
+					for (int k = 50000; k < 60000; k++) {
+						
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						label = w0.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c0++;
+						}
+						
+						label = w1.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c1++;
+						}
+
+						label = w01.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c01++;
+						}
+					}
+					
+					fw1 = new FileWriter(f1, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					bw1.write(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) + "\n" );
+					
+					bw1.close();
+					
+					//System.out.println(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) );
+					
+					//System.out.println("-- Mental Images --\n");
+					
+					w0.generateMentalImages();
+					w1.generateMentalImages();
+					w01.generateMentalImages();
+					
+					fw1 = new FileWriter(f2, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					StringBuilder strB;
+					
+					Iterator<Entry<String, int[]>> iterator = w0.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+					
+					iterator = w1.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+					
+					iterator = w01.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+										
+					bw1.close();
+					
+				} catch (FileNotFoundException e) {
+					
+					e.printStackTrace();
+					
+				} catch (IOException e) {
+					
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		System.out.println("-- Finish --\n");
 	}
 	
 	public static void allCombinations(StringBuilder combination, int set1, int set2, int limit) {

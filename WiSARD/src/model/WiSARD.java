@@ -123,6 +123,22 @@ public class WiSARD {
 		return this.syntethicTrainingSet;
 	}
 	
+	public HashMap<Integer, String> getRel1() {
+		return this.rel1;
+	}
+	
+	public void setRel1(HashMap<Integer, String> rel1){
+		this.rel1 = rel1;
+	}
+	
+	public HashMap<String, Integer> getRel2() {
+		return this.rel2;
+	}
+	
+	public void setRel2(HashMap<String, Integer> rel2){
+		this.rel2 = rel2;
+	}
+	
 	// Domain
 	
 	public void train(String label, String example ) {
