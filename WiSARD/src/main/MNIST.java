@@ -29,14 +29,68 @@ public class MNIST {
 		
 		startTime = System.nanoTime();
 		
+		//test();
+		
 		//two();
+		
 		//three();
 		
-		crossZero();
+		crossZero(1,10);
+		
+		crossOne(1,10);
+		
+		crossTwo(1,10);
+		
+		crossThree(1,10);
 		
 		endTime = System.nanoTime();
 		
 		System.out.println("\n-- Execution time: " + duration() + "ms --");
+	}
+	
+	public static void test() {
+		
+		WiSARD w0 = new WiSARD("w0", 28, 28, 28);
+		WiSARD w1 = new WiSARD("w1", 28, 28, 28);
+		WiSARD w01 = new WiSARD("w01", 28, 28, 28);
+		
+		String[] labels = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+		
+		for (int k = 0; k < labels.length; k++) {
+			
+			Discriminator discriminator = new Discriminator(28, 28);
+			discriminator.setId(labels[k]);
+			
+			Discriminator discriminator1 = new Discriminator(28, 28);
+			discriminator1.setId(labels[k]);
+			
+			Discriminator discriminator2 = new Discriminator(28, 28);
+			discriminator2.setId(labels[k]);
+			
+			discriminator1.setTuplas(discriminator.getTuplas());
+			discriminator2.setTuplas(discriminator.getTuplas());
+			
+			w0.getMap().put(labels[k], discriminator);
+			w0.getRel1().put(w0.getRel1().size(), labels[k]);
+			w0.getRel2().put(labels[k], w0.getRel2().size());
+			
+			w1.getMap().put(labels[k], discriminator1);
+			w1.getRel1().put(w1.getRel1().size(), labels[k]);
+			w1.getRel2().put(labels[k], w1.getRel2().size());
+			
+			w01.getMap().put(labels[k], discriminator2);
+			w01.getRel1().put(w01.getRel1().size(), labels[k]);
+			w01.getRel2().put(labels[k], w01.getRel2().size());
+		}
+		
+		System.out.println(w0.getMap().get("0").toString());
+		System.out.println(w1.getMap().get("0").toString());
+		System.out.println(w01.getMap().get("0").toString());
+		
+		System.out.println(w0.getMap().size());
+		System.out.println(w1.getMap().size());
+		System.out.println(w01.getMap().size());
+		
 	}
 	
 	public static void one() {
@@ -138,7 +192,7 @@ public class MNIST {
 		
 		allCombinations(new StringBuilder(), 5, 5, 10);
 		
-		for(int i = 1; i < 6; i++) {
+		for(int i = 0; i <1 ; i++) {
 			
 			System.out.println("Block " + i);
 			
@@ -436,18 +490,18 @@ public class MNIST {
 		System.out.println("-- Finish --\n");
 	}
 	
-	public static void crossZero() {
+	public static void crossZero(int blockLimit, int environmentLimit) {
 		
 		/* Random Mapping configuration
 		 * Intra-environment: equal
 		 * Inter-environment: equal
 		 * */
 		
+		System.out.println("-- Test Reference: 0 --\n");
+		
 		WiSARD w0 = new WiSARD("w0", 28, 28, 28);
 		WiSARD w1 = new WiSARD("w1", 28, 28, 28);
 		WiSARD w01 = new WiSARD("w01", 28, 28, 28);
-	
-		System.out.println("-- Test Reference: 0 --\n");
 		
 		String[] labels = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 		
@@ -455,18 +509,27 @@ public class MNIST {
 			Discriminator discriminator = new Discriminator(28, 28);
 			discriminator.setId(labels[i]);
 			
+			Discriminator discriminator1 = new Discriminator(28, 28);
+			discriminator1.setId(labels[i]);
+			
+			Discriminator discriminator2 = new Discriminator(28, 28);
+			discriminator2.setId(labels[i]);
+			
+			discriminator1.setTuplas(discriminator.getTuplas());
+			discriminator2.setTuplas(discriminator.getTuplas());
+			
 			w0.getMap().put(labels[i], discriminator);
 			w0.getRel1().put(w0.getRel1().size(), labels[i]);
 			w0.getRel2().put(labels[i], w0.getRel2().size());
+			
+			w1.getMap().put(labels[i], discriminator1);
+			w1.getRel1().put(w1.getRel1().size(), labels[i]);
+			w1.getRel2().put(labels[i], w1.getRel2().size());
+			
+			w01.getMap().put(labels[i], discriminator2);
+			w01.getRel1().put(w01.getRel1().size(), labels[i]);
+			w01.getRel2().put(labels[i], w01.getRel2().size());
 		}
-		
-		w1.setMap(w0.getMap());
-		w1.setRel1(w0.getRel1());
-		w1.setRel2(w0.getRel2());
-		
-		w01.setMap(w0.getMap());
-		w01.setRel1(w0.getRel1());
-		w01.setRel2(w0.getRel2());
 		
 		File f1, f2, f3;
 		FileReader fr1;
@@ -484,13 +547,13 @@ public class MNIST {
 		
 		System.out.println("-- Initializing experiments --\n");
 		
-		for(int i = 0; i < 1; i++) {
+		for(int i = 0; i < blockLimit; i++) {
 			
 			System.out.println("Block " + i);
 			
-			f1 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"Accuracy.txt");
+			f1 = new File("Input/MNIST/CrossValidation/Results/R0/Block"+i+"AccuracyR0.txt");
 			
-			for (int j = 0; j < 252; j++) {
+			for (int j = 0; j < environmentLimit; j++) {
 				
 				w0.clear();
 				w1.clear();
@@ -498,7 +561,7 @@ public class MNIST {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"env"+j+"DM.txt");
+				f2 = new File("Input/MNIST/CrossValidation/Results/R0/Block"+i+"env"+j+"R0.txt");
 				f3 = new File("Input/MNIST/CrossValidation/Block"+i+"/env"+j+".txt");
 				
 				try {
@@ -670,7 +733,7 @@ public class MNIST {
 		System.out.println("-- Finish --\n");
 	}
 	
-	public static void crossOne() {
+	public static void crossOne(int blockLimit, int environmentLimit) {
 		
 		/* Random Mapping configuration
 		 * Intra-environment: equal
@@ -679,31 +742,6 @@ public class MNIST {
 		
 		System.out.println("-- Test Reference: 1 --\n");
 		
-		WiSARD w0 = new WiSARD("w0", 28, 28, 28);
-		WiSARD w1 = new WiSARD("w1", 28, 28, 28);
-		WiSARD w01 = new WiSARD("w01", 28, 28, 28);
-	
-		System.out.println("-- Test Reference: 0 --\n");
-		
-		String[] labels = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-		
-		for (int i = 0; i < labels.length; i++) {
-			Discriminator discriminator = new Discriminator(28, 28);
-			discriminator.setId(labels[i]);
-			
-			w0.getMap().put(labels[i], discriminator);
-			w0.getRel1().put(w0.getRel1().size(), labels[i]);
-			w0.getRel2().put(labels[i], w0.getRel2().size());
-		}
-		
-		w1.setMap(w0.getMap());
-		w1.setRel1(w0.getRel1());
-		w1.setRel2(w0.getRel2());
-		
-		w01.setMap(w0.getMap());
-		w01.setRel1(w0.getRel1());
-		w01.setRel2(w0.getRel2());
-		
 		File f1, f2, f3;
 		FileReader fr1;
 		BufferedReader br1;
@@ -720,26 +758,52 @@ public class MNIST {
 		
 		System.out.println("-- Initializing experiments --\n");
 		
-		for(int i = 0; i < 1; i++) {
+		for(int i = 0; i < blockLimit; i++) {
 			
 			System.out.println("Block " + i);
 			
-			f1 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"Accuracy.txt");
+			f1 = new File("Input/MNIST/CrossValidation/Results/R1/Block"+i+"AccuracyR1.txt");
 			
-			for (int j = 0; j < 252; j++) {
+			for (int j = 0; j < environmentLimit; j++) {
 				
-				w0.clear();
-				w1.clear();
-				w01.clear();
+				WiSARD w0 = new WiSARD("w0", 28, 28, 28);
+				WiSARD w1 = new WiSARD("w1", 28, 28, 28);
+				WiSARD w01 = new WiSARD("w01", 28, 28, 28);
+				
+				String[] labels = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+				
+				for (int k = 0; k < labels.length; k++) {
+					Discriminator discriminator = new Discriminator(28, 28);
+					discriminator.setId(labels[k]);
+					
+					Discriminator discriminator1 = new Discriminator(28, 28);
+					discriminator1.setId(labels[k]);
+					
+					Discriminator discriminator2 = new Discriminator(28, 28);
+					discriminator2.setId(labels[k]);
+					
+					discriminator1.setTuplas(discriminator.getTuplas());
+					discriminator2.setTuplas(discriminator.getTuplas());
+					
+					w0.getMap().put(labels[k], discriminator);
+					w0.getRel1().put(w0.getRel1().size(), labels[k]);
+					w0.getRel2().put(labels[k], w0.getRel2().size());
+					
+					w1.getMap().put(labels[k], discriminator1);
+					w1.getRel1().put(w1.getRel1().size(), labels[k]);
+					w1.getRel2().put(labels[k], w1.getRel2().size());
+					
+					w01.getMap().put(labels[k], discriminator2);
+					w01.getRel1().put(w01.getRel1().size(), labels[k]);
+					w01.getRel2().put(labels[k], w01.getRel2().size());
+				}
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"env"+j+"DM.txt");
+				f2 = new File("Input/MNIST/CrossValidation/Results/R1/Block"+i+"env"+j+"R1.txt");
 				f3 = new File("Input/MNIST/CrossValidation/Block"+i+"/env"+j+".txt");
 				
 				try {
-					
-					//System.out.println("-- Training --\n");
 					
 					fr1 = new FileReader(f3);
 					br1 = new BufferedReader(fr1);
@@ -771,8 +835,6 @@ public class MNIST {
 						w1.train(splitter[0], example.toString());
 						w01.train(splitter[0], example.toString());
 					}
-
-					//System.out.println("-- Testing --\n");
 					
 					c0 = 0;
 					c1 = 0;
@@ -906,7 +968,7 @@ public class MNIST {
 		System.out.println("-- Finish --\n");
 	}
 	
-	public static void crossTwo() {
+	public static void crossTwo(int blockLimit, int environmentLimit) {
 		
 		/* Random Mapping configuration
 		 * Intra-environment: different
@@ -935,13 +997,13 @@ public class MNIST {
 		WiSARD w1 = new WiSARD("w1", 28, 28, 28);
 		WiSARD w01 = new WiSARD("w01", 28, 28, 28);
 		
-		for(int i = 0; i < 1; i++) {
+		for(int i = 0; i < blockLimit; i++) {
 			
 			System.out.println("Block " + i);
 			
-			f1 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"Accuracy.txt");
+			f1 = new File("Input/MNIST/CrossValidation/Results/R2/Block"+i+"AccuracyR2.txt");
 			
-			for (int j = 0; j < 252; j++) {
+			for (int j = 0; j < environmentLimit; j++) {
 				
 				w0.clear();
 				w1.clear();
@@ -949,7 +1011,7 @@ public class MNIST {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"env"+j+"DM.txt");
+				f2 = new File("Input/MNIST/CrossValidation/Results/R2/Block"+i+"env"+j+"R2.txt");
 				f3 = new File("Input/MNIST/CrossValidation/Block"+i+"/env"+j+".txt");
 				
 				try {
@@ -1121,7 +1183,7 @@ public class MNIST {
 		System.out.println("-- Finish --\n");
 	}
 	
-	public static void crossThree() {
+	public static void crossThree(int blockLimit, int environmentLimit) {
 		
 		/* Random Mapping configuration
 		 * Intra-environment: different
@@ -1146,13 +1208,13 @@ public class MNIST {
 		
 		System.out.println("-- Initializing experiments --\n");
 		
-		for(int i = 0; i < 1; i++) {
+		for(int i = 0; i < blockLimit; i++) {
 			
 			System.out.println("Block " + i);
 			
-			f1 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"Accuracy.txt");
+			f1 = new File("Input/MNIST/CrossValidation/Results/R3/Block"+i+"AccuracyR3.txt");
 			
-			for (int j = 0; j < 252; j++) {
+			for (int j = 0; j < environmentLimit; j++) {
 				
 				WiSARD w0 = new WiSARD("w0", 28, 28, 28);
 				WiSARD w1 = new WiSARD("w1", 28, 28, 28);
@@ -1160,7 +1222,7 @@ public class MNIST {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"env"+j+"DM.txt");
+				f2 = new File("Input/MNIST/CrossValidation/Results/R3/Block"+i+"env"+j+"R3.txt");
 				f3 = new File("Input/MNIST/CrossValidation/Block"+i+"/env"+j+".txt");
 				
 				try {
