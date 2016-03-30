@@ -37,11 +37,11 @@ public class MNIST {
 		
 		crossZero(1,10);
 		
-		crossOne(1,10);
+		//crossOne(1,10);
 		
-		crossTwo(1,10);
+		//crossTwo(1,10);
 		
-		crossThree(1,10);
+		//crossThree(1,10);
 		
 		endTime = System.nanoTime();
 		

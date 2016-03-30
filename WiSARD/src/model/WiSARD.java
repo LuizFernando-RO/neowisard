@@ -330,6 +330,8 @@ public class WiSARD {
 				}
 			}
 			
+			// Scale the mental image pixels into 0-255 range
+			/*
 			for(int i = 0; i < getWidth(); i++) {
 				
 				for (int j = 0; j < getHeight(); j++) {
@@ -338,6 +340,7 @@ public class WiSARD {
 			
 				}
 			}
+			*/
 			
 			getMentalImage().put(label, image);
 		}
