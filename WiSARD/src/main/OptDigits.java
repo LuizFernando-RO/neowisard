@@ -29,7 +29,9 @@ public class OptDigits {
 		
 		startTime = System.nanoTime();
 		
-		two();
+		teste();
+		
+		//two();
 		
 		//three();
 		
@@ -44,6 +46,57 @@ public class OptDigits {
 		endTime = System.nanoTime();
 		
 		System.out.println("\n-- Execution time: " + duration() + "ms --");
+	}
+	
+	public static void teste() {
+		
+		//allCombinations(new StringBuilder(), 9, 9, 18);
+		
+		String fileNamePrefix ="Input/OptDigits/10-fold/fold",
+			   fileNameTrainingSufix = "tra.dat", fileNameTestingSufix = "tst.dat";
+		
+		String fullName;
+		
+		File file = new File("");
+		FileReader fr;
+		BufferedReader br;
+		
+		FileWriter fw;
+		BufferedWriter bw;
+		
+		try {
+			
+			// Iterate over 10 folds
+			for (int i = 1; i <= 10; i++) {
+				
+				fullName = fileNamePrefix + i + "/optdigits-10-" + i + fileNameTrainingSufix;
+				
+				System.out.println(fullName);
+				
+				// Training file
+				
+				file = new File(fullName);
+				fr = new FileReader(file);
+				br = new BufferedReader(fr);
+				
+				allCombinations(new StringBuilder(), 9, 9, 18);
+				
+				for (int j = 0; j < 48620; j++) {
+					
+					
+				}
+				
+				ArrayList<String> trainSet1 = new ArrayList<String>();
+				ArrayList<String> trainSet2 = new ArrayList<String>();
+				
+				
+			}
+			
+		} catch (FileNotFoundException e) {
+			
+			System.out.println("Error: file '" + file.getName() +"' not found.");
+		}
+		
 	}
 	
 	public static void test() {
@@ -1403,7 +1456,7 @@ public class OptDigits {
 	public static void allCombinations(StringBuilder combination, int set1, int set2, int limit) {
 		
 		if(combination.length() == limit) {
-			//System.out.println("Combination " + index + " - " + combination.toString());
+			System.out.println("Combination " + index + " - " + combination.toString());
 			combinations.add(combination.toString());
 			index++;
 		}
