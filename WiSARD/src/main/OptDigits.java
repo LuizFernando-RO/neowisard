@@ -65,12 +65,13 @@ public class OptDigits {
 		FileWriter fw;
 		BufferedWriter bw;
 		
-		allCombinations(new StringBuilder(), 9, 9, 18);
+		//allCombinations(new StringBuilder(), 9, 9, 18);
+		allCombinations(new StringBuilder(), 3, 3, 6);
 		
 		try {
 			
 			// Iterate over 10 folds
-			for (int i = 1; i <= 1; i++) {
+			for (int i = 1; i <= 10; i++) {
 				
 				System.out.println("Environments for fold " + i);
 				
@@ -89,7 +90,7 @@ public class OptDigits {
 					trainingSet[j] = br.readLine();
 				}
 			
-				for (int j = 0; j < 48620; j++) {
+				for (int j = 0; j < combinations.size(); j++) {
 					
 					ArrayList<String> trainSet1 = new ArrayList<String>();
 					ArrayList<String> trainSet2 = new ArrayList<String>();
@@ -108,15 +109,21 @@ public class OptDigits {
 							
 							trainSet2.add(trainingSet[k]);
 						
-						if((k+1) % 281 == 0 && k != 0)
-							
+						//if((k+1) % 281 == 0 && k != 0)
+						if((k+1) % 843 == 0 && k != 0){
+							System.out.println("up on k = " + k);
 							combinationIndex++;
+						}		
 					}
-				
-					file = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
+					
+					file = new File("Input/OptDigits/10-fold/Results.txt");
 					
 					fw = new FileWriter(file);
 					bw = new BufferedWriter(fw);
+					
+					System.out.println("Full set "+trainingSet.length);
+					System.out.println("train 1 "+trainSet1.size());
+					System.out.println("train 2"+trainSet1.size() + "\n-");
 					
 					for(int k = 0; k < trainSet1.size(); k++) 
 						
