@@ -57,44 +57,86 @@ public class OptDigits {
 		
 		String fullName;
 		
-		File file = new File("");
+		File file;
 		FileReader fr;
 		BufferedReader br;
 		
+		File outFile;
 		FileWriter fw;
 		BufferedWriter bw;
+		
+		allCombinations(new StringBuilder(), 9, 9, 18);
 		
 		try {
 			
 			// Iterate over 10 folds
-			for (int i = 1; i <= 10; i++) {
+			for (int i = 1; i <= 1; i++) {
+				
+				System.out.println("Environments for fold " + i);
 				
 				fullName = fileNamePrefix + i + "/optdigits-10-" + i + fileNameTrainingSufix;
 				
 				System.out.println(fullName);
 				
-				// Training file
-				
 				file = new File(fullName);
 				fr = new FileReader(file);
 				br = new BufferedReader(fr);
 				
-				allCombinations(new StringBuilder(), 9, 9, 18);
+				String[] trainingSet = new String[5058];
 				
+				for(int j = 0; j < 5058; j++) {
+					
+					trainingSet[j] = br.readLine();
+				}
+			
 				for (int j = 0; j < 48620; j++) {
 					
+					ArrayList<String> trainSet1 = new ArrayList<String>();
+					ArrayList<String> trainSet2 = new ArrayList<String>();
 					
+					String combination = combinations.get(j);
+					
+					int combinationIndex = 0;
+					
+					for (int k = 0; k < 5058; k++) {
+						
+						if(Integer.valueOf(combination.charAt(combinationIndex) - '0') == 1) 
+							
+							trainSet1.add(trainingSet[k]);
+						
+						else
+							
+							trainSet2.add(trainingSet[k]);
+						
+						if((k+1) % 281 == 0 && k != 0)
+							
+							combinationIndex++;
+					}
+				
+					file = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
+					
+					fw = new FileWriter(file);
+					bw = new BufferedWriter(fw);
+					
+					for(int k = 0; k < trainSet1.size(); k++) 
+						
+						bw.write(trainSet1.get(k) + "\n");
+					
+					for(int k = 0; k < trainSet2.size(); k++) 
+						
+						bw.write(trainSet2.get(k) + "\n");
+					
+					bw.close();
 				}
-				
-				ArrayList<String> trainSet1 = new ArrayList<String>();
-				ArrayList<String> trainSet2 = new ArrayList<String>();
-				
-				
 			}
 			
 		} catch (FileNotFoundException e) {
 			
-			System.out.println("Error: file '" + file.getName() +"' not found.");
+			System.out.println("Error: file not found.");
+		
+		} catch (IOException e) {
+			
+			System.out.println("Error while reading file.");
 		}
 		
 	}
