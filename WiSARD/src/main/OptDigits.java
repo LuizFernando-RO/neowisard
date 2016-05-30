@@ -29,11 +29,9 @@ public class OptDigits {
 		
 		startTime = System.nanoTime();
 		
-		teste();
+		binarize();
 		
-		//two();
-		
-		//three();
+		//run();
 		
 		//crossZero(1,10);
 		
@@ -48,25 +46,145 @@ public class OptDigits {
 		System.out.println("\n-- Execution time: " + duration() + "ms --");
 	}
 	
-	public static void teste() {
+	public static void binarize() {
 		
-		//allCombinations(new StringBuilder(), 9, 9, 18);
+		int[] vector = {0,8,16,16,16,16,16,16,5,16,16,16,16,16,16,15,5,16,16,16,16,16,16,8,1,16,16,16,16,16,16,2,1,15,16,16,16,16,14,0,7,16,16,16,16,16,16,6,10,16,16,16,16,16,16,13,1,10,16,16,16,16,16,16};
+		
+		int foldLimit = 10, trainLimit = 5058, testLimit = 562;
+		
+		for (int i = 1; i <= foldLimit; i++) {
+			
+			String trainName = "Input/OptDigits/10-fold/fold"+i+"/optdigits-10-"+i+"tra.dat", 
+				   testName = "Input/OptDigits/10-fold/fold"+i+"/optdigits-10-"+i+"tst.dat",
+				   outTrainName = "Input/OptDigits/10-fold/fold"+i+"/optdigits-10-"+i+"trabin.dat",
+				   outTestName = "Input/OptDigits/10-fold/fold"+i+"/optdigits-10-"+i+"tstbin.dat";
+			
+			StringBuilder example;
+			String[] splitter;
+			
+			File inFile;			
+			FileReader fr;
+			BufferedReader br;
+			
+			File outFile;
+			FileWriter fw;
+			BufferedWriter bw;
+			
+			try {
+				
+				inFile = new File(trainName);
+				fr = new FileReader(inFile);
+				br = new BufferedReader(fr);
+				
+				outFile = new File(outTrainName);
+				fw = new FileWriter(outFile);
+				bw = new BufferedWriter(fw);
+				
+				for (int j = 0; j < trainLimit; j++) {
+					
+					splitter = br.readLine().split(",");
+					
+					example = new StringBuilder();
+					
+					int count = 0, avg = 0;
+					
+					for (int k = 0; k < splitter.length - 1; k++) {
+						
+						if(Integer.valueOf(splitter[k].trim()) > 0) {
+							
+							count++;
+							avg += Integer.valueOf(splitter[k].trim());
+						}
+					}
+					
+					avg = avg / count;
+					
+					for (int k = 0; k < splitter.length - 1; k++) {
+						
+						if(Integer.valueOf(splitter[k].trim()) >= avg) 
+							
+							example.append("1");
+						
+						else
+							
+							example.append("0");
+					}
+					
+					bw.write(example + splitter[splitter.length - 1].trim() + "\n");
+				}
+				
+				bw.close();
+				
+				inFile = new File(testName);
+				fr = new FileReader(inFile);
+				br = new BufferedReader(fr);
+				
+				outFile = new File(outTestName);
+				fw = new FileWriter(outFile);
+				bw = new BufferedWriter(fw);
+				
+				for (int j = 0; j < testLimit; j++) {
+					
+					splitter = br.readLine().split(",");
+					
+					example = new StringBuilder();
+					
+					int count = 0, avg = 0;
+					
+					for (int k = 0; k < splitter.length - 1; k++) {
+						
+						if(Integer.valueOf(splitter[k].trim()) > 0) {
+							
+							count++;
+							avg += Integer.valueOf(splitter[k].trim());
+						}
+					}
+					
+					avg = avg / count;
+					
+					for (int k = 0; k < splitter.length - 1; k++) {
+						
+						if(Integer.valueOf(splitter[k].trim()) >= avg) 
+							
+							example.append("1");
+						
+						else
+							
+							example.append("0");
+					}
+					
+					bw.write(example + splitter[splitter.length - 1].trim() + "\n");
+				}
+				
+				bw.close();
+				
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static void run() {
 		
 		String fileNamePrefix ="Input/OptDigits/10-fold/fold",
 			   fileNameTrainingSufix = "tra.dat", fileNameTestingSufix = "tst.dat";
 		
 		String fullName;
 		
+		int combinationSize = 6;
+		
 		File file;
 		FileReader fr;
 		BufferedReader br;
 		
-		File outFile;
 		FileWriter fw;
 		BufferedWriter bw;
 		
-		//allCombinations(new StringBuilder(), 9, 9, 18);
-		allCombinations(new StringBuilder(), 3, 3, 6);
+		allCombinations(new StringBuilder(), combinationSize / 2, combinationSize / 2, combinationSize);
 		
 		try {
 			
@@ -85,7 +203,7 @@ public class OptDigits {
 				
 				String[] trainingSet = new String[5058];
 				
-				for(int j = 0; j < 5058; j++) {
+				for(int j = 0; j < trainingSet.length; j++) {
 					
 					trainingSet[j] = br.readLine();
 				}
@@ -109,8 +227,7 @@ public class OptDigits {
 							
 							trainSet2.add(trainingSet[k]);
 						
-						//if((k+1) % 281 == 0 && k != 0)
-						if((k+1) % 843 == 0 && k != 0){
+						if((k+1) % (trainingSet.length / combinationSize) == 0 && k != 0){
 							System.out.println("up on k = " + k);
 							combinationIndex++;
 						}		
@@ -147,480 +264,31 @@ public class OptDigits {
 		}
 		
 	}
-	
-	public static void test() {
 		
-		WiSARD w0 = new WiSARD("w0", 28, 28, 28);
-		WiSARD w1 = new WiSARD("w1", 28, 28, 28);
-		WiSARD w01 = new WiSARD("w01", 28, 28, 28);
-		
-		String[] labels = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-		
-		for (int k = 0; k < labels.length; k++) {
-			
-			Discriminator discriminator = new Discriminator(28, 28);
-			discriminator.setId(labels[k]);
-			
-			Discriminator discriminator1 = new Discriminator(28, 28);
-			discriminator1.setId(labels[k]);
-			
-			Discriminator discriminator2 = new Discriminator(28, 28);
-			discriminator2.setId(labels[k]);
-			
-			discriminator1.setTuplas(discriminator.getTuplas());
-			discriminator2.setTuplas(discriminator.getTuplas());
-			
-			w0.getMap().put(labels[k], discriminator);
-			w0.getRel1().put(w0.getRel1().size(), labels[k]);
-			w0.getRel2().put(labels[k], w0.getRel2().size());
-			
-			w1.getMap().put(labels[k], discriminator1);
-			w1.getRel1().put(w1.getRel1().size(), labels[k]);
-			w1.getRel2().put(labels[k], w1.getRel2().size());
-			
-			w01.getMap().put(labels[k], discriminator2);
-			w01.getRel1().put(w01.getRel1().size(), labels[k]);
-			w01.getRel2().put(labels[k], w01.getRel2().size());
-		}
-		
-		System.out.println(w0.getMap().get("0").toString());
-		System.out.println(w1.getMap().get("0").toString());
-		System.out.println(w01.getMap().get("0").toString());
-		
-		System.out.println(w0.getMap().size());
-		System.out.println(w1.getMap().size());
-		System.out.println(w01.getMap().size());
-		
-	}
-	
-	public static void one() {
-		
-		WiSARD w1 = new WiSARD("w1", 28,28,28);
-		
-		train(w1, 60000, "Input/MNIST/Original/training.csv");
-		test(w1, 10000, "Input/MNIST/Original/testing.csv");
-		w1.generateMentalImages();
-		w1.syntheticTrainingSet();
-		
-		int[][] teste = w1.getSyntheticTrainingSet().get("0");
-		
-		for(int j = 0; j < teste[0].length; j++) {
-			System.out.print(teste[0][j]);
-		}
-		
-		System.out.println();
-		
-		for(int j = 0; j < teste[0].length; j++) {
-			System.out.print(teste[1][j]);
-		}
-		
-		/*
-		w1.mentalImage("0");
-		w1.mentalImage("1");
-		w1.mentalImage("2");
-		w1.mentalImage("3");
-		w1.mentalImage("4");
-		w1.mentalImage("5");
-		w1.mentalImage("6");
-		w1.mentalImage("7");
-		w1.mentalImage("8");
-		w1.mentalImage("9");*/
-	}
-	
-	public static void two() {
-		
-		int m = 32;
-		
-		StringBuilder example;
-		
-		String path = "Input/OptDigits/Original/training.txt";
-		int trainingSize = 1934;
-		
-		File f;
-		FileReader fr;
-		BufferedReader br;
-
-		//Load the training file
-		
-		String[] trainingSet = new String[1934];
-		
-		f = new File(path);
-		
-		try {
-			
-			fr = new FileReader(f);
-			br = new BufferedReader(fr);
-		
-			for(int i = 0; i < trainingSize; i++) {
-				
-				example = new StringBuilder();
-				
-				for (int j = 0; j < m; j++) {
-					
-					example.append(br.readLine());
-				}
-				
-				example.append(br.readLine().trim());
-				
-				trainingSet[i] = example.toString();
-			}
-			
-			br.close();
-			
-		} catch (FileNotFoundException e) {
-			
-			System.out.println("File not found!");
-			
-		} catch (IOException e) {
-			
-			System.out.println("Error!");
-		}
-		
-		System.out.println("Training set loaded successfully!");
-		
-		// Dividing into 6 blocks
-		
-		allCombinations(new StringBuilder(), 5, 5, 10);
-		
-		for(int i = 0; i < 6 ; i++) {
-			
-			System.out.println("Block " + i);
-			
-			int testStart = i * 322, testEnd;
-			
-			if(i < 5)
-			
-				testEnd = (i+1) * 322;
-			
-			else 
-				
-				testEnd = 1934;
-				
-			for (int j = 0; j < 252; j++) {
-				
-				System.out.println("Environment " + j);
-				
-				String combination = combinations.get(j);
-				
-				int combinationIndex = 0;
-				
-				ArrayList<String> testSet = new ArrayList<String>();
-				ArrayList<String> trainSet1 = new ArrayList<String>();
-				ArrayList<String> trainSet2 = new ArrayList<String>();
-				
-				for (int k = 0; k < 1934; k++) {
-					
-					//Test set
-					if(k >= testStart && k < testEnd) {
-						
-						testSet.add(trainingSet[k]);
-					}
-					
-					// Training set
-					else {
-						
-						// Training for first WiSARD
-						if(Integer.valueOf(combination.charAt(combinationIndex) - '0') == 1) 
-							
-							trainSet1.add(trainingSet[k]);
-						
-						// Training for second WiSARD
-						else
-							
-							trainSet2.add(trainingSet[k]);
-						
-						if(i < 5) {
-						
-							if( k % 161 == 0 && k != testEnd && k > 0 && k <= 1610) {
-								
-								combinationIndex++;
-							}
-						}
-						
-						else {
-							
-							if( k == 1772) {
-								
-								combinationIndex++;
-							}
-						}
-					}
-				}
-				
-				f = new File("Input/OptDigits/CrossValidation/Block" + i + "/env" + j + ".txt");
-				FileWriter fw;
-				BufferedWriter bw;
-				
-				try {
-					
-					fw = new FileWriter(f);
-					
-					bw = new BufferedWriter(fw);
-					
-					//bw.write("w1\n");
-					
-					for(int k = 0; k < trainSet1.size(); k++) 
-					
-						bw.write(trainSet1.get(k) + "\n");
-					
-					//bw.write("w2\n");
-					
-					for(int k = 0; k < trainSet2.size(); k++) 
-						
-						bw.write(trainSet2.get(k) + "\n");
-					
-					//bw.write("test\n");
-					
-					for(int k = 0; k < testSet.size(); k++) 
-						
-						bw.write(testSet.get(k) + "\n");
-					
-					bw.close();
-					
-				} catch (FileNotFoundException e) {
-					
-					System.out.println("File not found!");
-				} catch (IOException e) {
-					
-					System.out.println("Error!");
-				}
-			}			
-		}
-	}
-	
-	public static void three() {
-		
-		System.out.println("-- Different Mapping --\n");
-		
-		File f1, f2, f3;
-		FileReader fr1;
-		BufferedReader br1;
-		
-		FileWriter fw1;
-		BufferedWriter bw1;
-		
-		StringBuilder example;
-		String[] splitter;
-		
-		String label;
-		
-		int c0, c1, c01;
-		
-		System.out.println("-- Initializing experiments --\n");
-		
-		WiSARD w0 = new WiSARD("w0", 28, 28, 28);
-		WiSARD w1 = new WiSARD("w1", 28, 28, 28);
-		WiSARD w01 = new WiSARD("w01", 28, 28, 28);
-		
-		for(int i = 0; i < 1; i++) {
-			
-			System.out.println("Block " + i);
-			
-			f1 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"Accuracy.txt");
-			
-			for (int j = 0; j < 252; j++) {
-				
-				w0.clear();
-				w1.clear();
-				w01.clear();
-				
-				System.out.println("Environment " + j);
-				
-				f2 = new File("Input/MNIST/CrossValidation/Results/Block"+i+"env"+j+"DM.txt");
-				f3 = new File("Input/MNIST/CrossValidation/Block"+i+"/env"+j+".txt");
-				
-				try {
-					
-					//System.out.println("-- Training --\n");
-					
-					fr1 = new FileReader(f3);
-					br1 = new BufferedReader(fr1);
-					
-					for (int k = 0; k < 25000; k++) {
-						
-						splitter = br1.readLine().toString().split(",");
-						example = new StringBuilder();
-						
-						for (int l = 1; l < splitter.length; l++) {
-							
-							example.append(splitter[l]);
-						}
-						
-						w0.train(splitter[0], example.toString());
-						w01.train(splitter[0], example.toString());
-					}
-					
-					for (int k = 25000; k < 50000; k++) {
-					
-						splitter = br1.readLine().toString().split(",");
-						example = new StringBuilder();
-						
-						for (int l = 1; l < splitter.length; l++) {
-							
-							example.append(splitter[l]);
-						}
-						
-						w1.train(splitter[0], example.toString());
-						w01.train(splitter[0], example.toString());
-					}
-
-					//System.out.println("-- Testing --\n");
-					
-					c0 = 0;
-					c1 = 0;
-					c01 = 0;
-					
-					for (int k = 50000; k < 60000; k++) {
-						
-						splitter = br1.readLine().toString().split(",");
-						example = new StringBuilder();
-						
-						for (int l = 1; l < splitter.length; l++) {
-							
-							example.append(splitter[l]);
-						}
-						
-						label = w0.test(example.toString());
-						
-						if(label.equals(splitter[0])) {
-							
-							c0++;
-						}
-						
-						label = w1.test(example.toString());
-						
-						if(label.equals(splitter[0])) {
-							
-							c1++;
-						}
-
-						label = w01.test(example.toString());
-						
-						if(label.equals(splitter[0])) {
-							
-							c01++;
-						}
-					}
-					
-					fw1 = new FileWriter(f1, true);
-					bw1 = new BufferedWriter(fw1);
-					
-					bw1.write(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) + "\n" );
-					
-					bw1.close();
-					
-					//System.out.println(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) );
-					
-					//System.out.println("-- Mental Images --\n");
-					
-					w0.generateMentalImages();
-					w1.generateMentalImages();
-					w01.generateMentalImages();
-					
-					fw1 = new FileWriter(f2, true);
-					bw1 = new BufferedWriter(fw1);
-					
-					StringBuilder strB;
-					
-					Iterator<Entry<String, int[]>> iterator = w0.getMentalImage().entrySet().iterator();
-					
-					while(iterator.hasNext()) {
-						
-						Entry<String, int[]> element = iterator.next();
-						
-						strB = new StringBuilder();
-						
-						strB.append(element.getKey() + ",");
-						
-						for (int l = 0; l < element.getValue().length - 1; l++) {
-							
-							strB.append(String.valueOf(element.getValue()[l]) + ",");
-						}
-						
-						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
-						
-						bw1.write(strB.toString() + "\n");
-					}
-					
-					iterator = w1.getMentalImage().entrySet().iterator();
-					
-					while(iterator.hasNext()) {
-						
-						Entry<String, int[]> element = iterator.next();
-						
-						strB = new StringBuilder();
-						
-						strB.append(element.getKey() + ",");
-						
-						for (int l = 0; l < element.getValue().length - 1; l++) {
-							
-							strB.append(String.valueOf(element.getValue()[l]) + ",");
-						}
-						
-						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
-						
-						bw1.write(strB.toString() + "\n");
-					}
-					
-					iterator = w01.getMentalImage().entrySet().iterator();
-					
-					while(iterator.hasNext()) {
-						
-						Entry<String, int[]> element = iterator.next();
-						
-						strB = new StringBuilder();
-						
-						strB.append(element.getKey() + ",");
-						
-						for (int l = 0; l < element.getValue().length - 1; l++) {
-							
-							strB.append(String.valueOf(element.getValue()[l]) + ",");
-						}
-						
-						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
-						
-						bw1.write(strB.toString() + "\n");
-					}
-										
-					bw1.close();
-					
-				} catch (FileNotFoundException e) {
-					
-					e.printStackTrace();
-					
-				} catch (IOException e) {
-					
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		System.out.println("-- Finish --\n");
-	}
-	
-	public static void crossZero(int blockLimit, int environmentLimit) {
+	public static void crossZero(int foldLimit, int environmentLimit) {
 		
 		/* Random Mapping configuration
 		 * Intra-environment: equal
 		 * Inter-environment: equal
-		 * */
+		 */
 		
 		System.out.println("-- Test Reference: 0 --\n");
 		
-		WiSARD w0 = new WiSARD("w0", 28, 28, 28);
-		WiSARD w1 = new WiSARD("w1", 28, 28, 28);
-		WiSARD w01 = new WiSARD("w01", 28, 28, 28);
+		WiSARD w0 = new WiSARD("w0", 8, 8, 8);
+		WiSARD w1 = new WiSARD("w1", 8, 8, 8);
+		WiSARD w01 = new WiSARD("w01", 8, 8, 8);
 		
 		String[] labels = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 		
 		for (int i = 0; i < labels.length; i++) {
-			Discriminator discriminator = new Discriminator(28, 28);
+			
+			Discriminator discriminator = new Discriminator(8, 8);
 			discriminator.setId(labels[i]);
 			
-			Discriminator discriminator1 = new Discriminator(28, 28);
+			Discriminator discriminator1 = new Discriminator(8, 8);
 			discriminator1.setId(labels[i]);
 			
-			Discriminator discriminator2 = new Discriminator(28, 28);
+			Discriminator discriminator2 = new Discriminator(8, 8);
 			discriminator2.setId(labels[i]);
 			
 			discriminator1.setTuplas(discriminator.getTuplas());
@@ -655,11 +323,9 @@ public class OptDigits {
 		
 		System.out.println("-- Initializing experiments --\n");
 		
-		for(int i = 0; i < blockLimit; i++) {
+		for(int i = 1; i <= 10; i++) {
 			
-			System.out.println("Block " + i);
-			
-			f1 = new File("Input/MNIST/CrossValidation/Results/R0/Block"+i+"AccuracyR0.txt");
+			f1 = new File("Input/OptDigits/10-fold/fold"+i+"/R0/AccuracyR0.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
@@ -669,8 +335,8 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/MNIST/CrossValidation/Results/R0/Block"+i+"env"+j+"R0.txt");
-				f3 = new File("Input/MNIST/CrossValidation/Block"+i+"/env"+j+".txt");
+				f2 = new File("Input/OptDigits/10-fold/fold"+i+"/R0/Env"+j+"MI.txt");
+				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/R0/Env"+j+".txt");
 				
 				try {
 					
@@ -679,7 +345,7 @@ public class OptDigits {
 					fr1 = new FileReader(f3);
 					br1 = new BufferedReader(fr1);
 					
-					for (int k = 0; k < 25000; k++) {
+					for (int k = 0; k < 2529; k++) {
 						
 						splitter = br1.readLine().toString().split(",");
 						example = new StringBuilder();
@@ -693,7 +359,7 @@ public class OptDigits {
 						w01.train(splitter[0], example.toString());
 					}
 					
-					for (int k = 25000; k < 50000; k++) {
+					for (int k = 2529; k < 5058; k++) {
 					
 						splitter = br1.readLine().toString().split(",");
 						example = new StringBuilder();
