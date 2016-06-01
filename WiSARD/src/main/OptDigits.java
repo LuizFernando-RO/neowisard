@@ -31,7 +31,7 @@ public class OptDigits {
 		
 		binarize();
 		
-		//run();
+		run();
 		
 		//crossZero(1,10);
 		
