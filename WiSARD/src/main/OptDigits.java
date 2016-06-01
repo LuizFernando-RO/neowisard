@@ -33,7 +33,7 @@ public class OptDigits {
 		
 		run();
 		
-		//crossZero(1,10);
+		crossZero(1,20, 8, 8, 16);
 		
 		//crossOne(1,10);
 		
@@ -103,14 +103,14 @@ public class OptDigits {
 						
 						if(Integer.valueOf(splitter[k].trim()) >= avg) 
 							
-							example.append("1");
+							example.append(",1");
 						
 						else
 							
-							example.append("0");
+							example.append(",0");
 					}
 					
-					bw.write(example + splitter[splitter.length - 1].trim() + "\n");
+					bw.write(splitter[splitter.length - 1].trim() + example + "\n");
 				}
 				
 				bw.close();
@@ -146,14 +146,14 @@ public class OptDigits {
 						
 						if(Integer.valueOf(splitter[k].trim()) >= avg) 
 							
-							example.append("1");
+							example.append(",1");
 						
 						else
 							
-							example.append("0");
+							example.append(",0");
 					}
 					
-					bw.write(example + splitter[splitter.length - 1].trim() + "\n");
+					bw.write(splitter[splitter.length - 1].trim() + example + "\n");
 				}
 				
 				bw.close();
@@ -171,7 +171,7 @@ public class OptDigits {
 	public static void run() {
 		
 		String fileNamePrefix ="Input/OptDigits/10-fold/fold",
-			   fileNameTrainingSufix = "tra.dat", fileNameTestingSufix = "tst.dat";
+			   fileNameTrainingSufix = "trabin.dat", fileNameTestingSufix = "tstbin.dat";
 		
 		String fullName;
 		
@@ -180,6 +180,7 @@ public class OptDigits {
 		File file;
 		FileReader fr;
 		BufferedReader br;
+		File testFile;
 		
 		FileWriter fw;
 		BufferedWriter bw;
@@ -187,7 +188,6 @@ public class OptDigits {
 		allCombinations(new StringBuilder(), combinationSize / 2, combinationSize / 2, combinationSize);
 		
 		try {
-			
 			// Iterate over 10 folds
 			for (int i = 1; i <= 10; i++) {
 				
@@ -195,9 +195,9 @@ public class OptDigits {
 				
 				fullName = fileNamePrefix + i + "/optdigits-10-" + i + fileNameTrainingSufix;
 				
-				System.out.println(fullName);
-				
 				file = new File(fullName);
+				testFile = new File(fileNamePrefix + i + "/optdigits-10-" + i + fileNameTestingSufix);
+				
 				fr = new FileReader(file);
 				br = new BufferedReader(fr);
 				
@@ -217,7 +217,7 @@ public class OptDigits {
 					
 					int combinationIndex = 0;
 					
-					for (int k = 0; k < 5058; k++) {
+					for (int k = 0; k < trainingSet.length; k++) {
 						
 						if(Integer.valueOf(combination.charAt(combinationIndex) - '0') == 1) 
 							
@@ -228,19 +228,20 @@ public class OptDigits {
 							trainSet2.add(trainingSet[k]);
 						
 						if((k+1) % (trainingSet.length / combinationSize) == 0 && k != 0){
-							System.out.println("up on k = " + k);
+							
 							combinationIndex++;
 						}		
 					}
 					
-					file = new File("Input/OptDigits/10-fold/Results.txt");
+					br.close();
+					
+					fr = new FileReader(testFile);
+					br = new BufferedReader(fr);
+					
+					file = new File("Input/OptDigits/10-fold/fold" + i + "/Env" + j + ".txt");
 					
 					fw = new FileWriter(file);
 					bw = new BufferedWriter(fw);
-					
-					System.out.println("Full set "+trainingSet.length);
-					System.out.println("train 1 "+trainSet1.size());
-					System.out.println("train 2"+trainSet1.size() + "\n-");
 					
 					for(int k = 0; k < trainSet1.size(); k++) 
 						
@@ -249,6 +250,11 @@ public class OptDigits {
 					for(int k = 0; k < trainSet2.size(); k++) 
 						
 						bw.write(trainSet2.get(k) + "\n");
+					
+					for(int k = 0; k < 562; k++) {
+						
+						bw.write(br.readLine() + "\n");
+					}
 					
 					bw.close();
 				}
@@ -265,7 +271,7 @@ public class OptDigits {
 		
 	}
 		
-	public static void crossZero(int foldLimit, int environmentLimit) {
+	public static void crossZero(int foldLimit, int environmentLimit, int n, int m, int tuples) {
 		
 		/* Random Mapping configuration
 		 * Intra-environment: equal
@@ -274,9 +280,9 @@ public class OptDigits {
 		
 		System.out.println("-- Test Reference: 0 --\n");
 		
-		WiSARD w0 = new WiSARD("w0", 8, 8, 8);
-		WiSARD w1 = new WiSARD("w1", 8, 8, 8);
-		WiSARD w01 = new WiSARD("w01", 8, 8, 8);
+		WiSARD w0 = new WiSARD("w0", n, m, tuples);
+		WiSARD w1 = new WiSARD("w1", n, m, tuples);
+		WiSARD w01 = new WiSARD("w01", n, m, tuples);
 		
 		String[] labels = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 		
@@ -323,7 +329,7 @@ public class OptDigits {
 		
 		System.out.println("-- Initializing experiments --\n");
 		
-		for(int i = 1; i <= 10; i++) {
+		for(int i = 1; i <= foldLimit; i++) {
 			
 			f1 = new File("Input/OptDigits/10-fold/fold"+i+"/R0/AccuracyR0.txt");
 			
@@ -336,7 +342,7 @@ public class OptDigits {
 				System.out.println("Environment " + j);
 				
 				f2 = new File("Input/OptDigits/10-fold/fold"+i+"/R0/Env"+j+"MI.txt");
-				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/R0/Env"+j+".txt");
+				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
 				
 				try {
 					
@@ -379,7 +385,7 @@ public class OptDigits {
 					c1 = 0;
 					c01 = 0;
 					
-					for (int k = 50000; k < 60000; k++) {
+					for (int k = 5058; k < 5620; k++) {
 						
 						splitter = br1.readLine().toString().split(",");
 						example = new StringBuilder();
@@ -414,7 +420,7 @@ public class OptDigits {
 					fw1 = new FileWriter(f1, true);
 					bw1 = new BufferedWriter(fw1);
 					
-					bw1.write(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) + "\n" );
+					bw1.write(j+","+ String.valueOf( (double) c0 / 562 ) + "," + String.valueOf( (double) c1 / 562 ) + "," + String.valueOf( (double) c01 / 562 ) + "\n" );
 					
 					bw1.close();
 					
@@ -1171,7 +1177,6 @@ public class OptDigits {
 	public static void allCombinations(StringBuilder combination, int set1, int set2, int limit) {
 		
 		if(combination.length() == limit) {
-			System.out.println("Combination " + index + " - " + combination.toString());
 			combinations.add(combination.toString());
 			index++;
 		}
