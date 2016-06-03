@@ -29,17 +29,17 @@ public class OptDigits {
 		
 		startTime = System.nanoTime();
 		
-		binarize();
+		//binarize();
 		
-		run();
+		//run();
 		
-		crossZero(1,20, 8, 8, 16);
+		//crossZero(10,20, 8, 8, 16);
 		
-		//crossOne(1,10);
+		//crossOne(10,20, 8, 8, 16);
 		
-		//crossTwo(1,10);
+		//crossTwo(10,20, 8, 8, 16);
 		
-		//crossThree(1,10);
+		//crossThree(10,20, 8, 8, 16);
 		
 		endTime = System.nanoTime();
 		
@@ -513,7 +513,7 @@ public class OptDigits {
 		System.out.println("-- Finish --\n");
 	}
 	
-	public static void crossOne(int blockLimit, int environmentLimit) {
+	public static void crossOne(int foldLimit, int environmentLimit, int n, int m, int tuples) {
 		
 		/* Random Mapping configuration
 		 * Intra-environment: equal
@@ -538,28 +538,28 @@ public class OptDigits {
 		
 		System.out.println("-- Initializing experiments --\n");
 		
-		for(int i = 0; i < blockLimit; i++) {
+		for(int i = 1; i <= foldLimit; i++) {
 			
 			System.out.println("Block " + i);
 			
-			f1 = new File("Input/MNIST/CrossValidation/Results/R1/Block"+i+"AccuracyR1.txt");
+			f1 = new File("Input/OptDigits/10-fold/fold"+i+"/R1/AccuracyR1.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
-				WiSARD w0 = new WiSARD("w0", 28, 28, 28);
-				WiSARD w1 = new WiSARD("w1", 28, 28, 28);
-				WiSARD w01 = new WiSARD("w01", 28, 28, 28);
+				WiSARD w0 = new WiSARD("w0", n, m, tuples);
+				WiSARD w1 = new WiSARD("w1", n, m, tuples);
+				WiSARD w01 = new WiSARD("w01", n, m, tuples);
 				
 				String[] labels = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 				
 				for (int k = 0; k < labels.length; k++) {
-					Discriminator discriminator = new Discriminator(28, 28);
+					Discriminator discriminator = new Discriminator(n, m);
 					discriminator.setId(labels[k]);
 					
-					Discriminator discriminator1 = new Discriminator(28, 28);
+					Discriminator discriminator1 = new Discriminator(n, m);
 					discriminator1.setId(labels[k]);
 					
-					Discriminator discriminator2 = new Discriminator(28, 28);
+					Discriminator discriminator2 = new Discriminator(n, m);
 					discriminator2.setId(labels[k]);
 					
 					discriminator1.setTuplas(discriminator.getTuplas());
@@ -580,15 +580,15 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/MNIST/CrossValidation/Results/R1/Block"+i+"env"+j+"R1.txt");
-				f3 = new File("Input/MNIST/CrossValidation/Block"+i+"/env"+j+".txt");
+				f2 = new File("Input/OptDigits/10-fold/fold"+i+"/R1/Env"+j+"MI.txt");
+				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
 				
 				try {
 					
 					fr1 = new FileReader(f3);
 					br1 = new BufferedReader(fr1);
 					
-					for (int k = 0; k < 25000; k++) {
+					for (int k = 0; k < 2529; k++) {
 						
 						splitter = br1.readLine().toString().split(",");
 						example = new StringBuilder();
@@ -602,7 +602,7 @@ public class OptDigits {
 						w01.train(splitter[0], example.toString());
 					}
 					
-					for (int k = 25000; k < 50000; k++) {
+					for (int k = 2529; k < 5058; k++) {
 					
 						splitter = br1.readLine().toString().split(",");
 						example = new StringBuilder();
@@ -620,7 +620,7 @@ public class OptDigits {
 					c1 = 0;
 					c01 = 0;
 					
-					for (int k = 50000; k < 60000; k++) {
+					for (int k = 5058; k < 5620; k++) {
 						
 						splitter = br1.readLine().toString().split(",");
 						example = new StringBuilder();
@@ -655,13 +655,9 @@ public class OptDigits {
 					fw1 = new FileWriter(f1, true);
 					bw1 = new BufferedWriter(fw1);
 					
-					bw1.write(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) + "\n" );
+					bw1.write(j+","+ String.valueOf( (double) c0 / 562 ) + "," + String.valueOf( (double) c1 / 562 ) + "," + String.valueOf( (double) c01 / 562 ) + "\n" );
 					
 					bw1.close();
-					
-					//System.out.println(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) );
-					
-					//System.out.println("-- Mental Images --\n");
 					
 					w0.generateMentalImages();
 					w1.generateMentalImages();
@@ -748,7 +744,7 @@ public class OptDigits {
 		System.out.println("-- Finish --\n");
 	}
 	
-	public static void crossTwo(int blockLimit, int environmentLimit) {
+	public static void crossTwo(int foldLimit, int environmentLimit, int n, int m, int tuples) {
 		
 		/* Random Mapping configuration
 		 * Intra-environment: different
@@ -773,15 +769,15 @@ public class OptDigits {
 		
 		System.out.println("-- Initializing experiments --\n");
 		
-		WiSARD w0 = new WiSARD("w0", 28, 28, 28);
-		WiSARD w1 = new WiSARD("w1", 28, 28, 28);
-		WiSARD w01 = new WiSARD("w01", 28, 28, 28);
+		WiSARD w0 = new WiSARD("w0", n, m, tuples);
+		WiSARD w1 = new WiSARD("w1", n, m, tuples);
+		WiSARD w01 = new WiSARD("w01", n, m, tuples);
 		
-		for(int i = 0; i < blockLimit; i++) {
+		for(int i = 1; i <= foldLimit; i++) {
 			
 			System.out.println("Block " + i);
 			
-			f1 = new File("Input/MNIST/CrossValidation/Results/R2/Block"+i+"AccuracyR2.txt");
+			f1 = new File("Input/OptDigits/10-fold/fold"+i+"/R2/AccuracyR2.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
@@ -791,17 +787,15 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/MNIST/CrossValidation/Results/R2/Block"+i+"env"+j+"R2.txt");
-				f3 = new File("Input/MNIST/CrossValidation/Block"+i+"/env"+j+".txt");
+				f2 = new File("Input/OptDigits/10-fold/fold"+i+"/R2/Env"+j+"MI.txt");
+				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
 				
 				try {
-					
-					//System.out.println("-- Training --\n");
 					
 					fr1 = new FileReader(f3);
 					br1 = new BufferedReader(fr1);
 					
-					for (int k = 0; k < 25000; k++) {
+					for (int k = 0; k < 2529; k++) {
 						
 						splitter = br1.readLine().toString().split(",");
 						example = new StringBuilder();
@@ -815,7 +809,7 @@ public class OptDigits {
 						w01.train(splitter[0], example.toString());
 					}
 					
-					for (int k = 25000; k < 50000; k++) {
+					for (int k = 2529; k < 5058; k++) {
 					
 						splitter = br1.readLine().toString().split(",");
 						example = new StringBuilder();
@@ -829,13 +823,11 @@ public class OptDigits {
 						w01.train(splitter[0], example.toString());
 					}
 
-					//System.out.println("-- Testing --\n");
-					
 					c0 = 0;
 					c1 = 0;
 					c01 = 0;
 					
-					for (int k = 50000; k < 60000; k++) {
+					for (int k = 5058; k < 5620; k++) {
 						
 						splitter = br1.readLine().toString().split(",");
 						example = new StringBuilder();
@@ -870,13 +862,9 @@ public class OptDigits {
 					fw1 = new FileWriter(f1, true);
 					bw1 = new BufferedWriter(fw1);
 					
-					bw1.write(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) + "\n" );
+					bw1.write(j+","+ String.valueOf( (double) c0 / 562 ) + "," + String.valueOf( (double) c1 / 562 ) + "," + String.valueOf( (double) c01 / 562 ) + "\n" );
 					
 					bw1.close();
-					
-					//System.out.println(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) );
-					
-					//System.out.println("-- Mental Images --\n");
 					
 					w0.generateMentalImages();
 					w1.generateMentalImages();
@@ -963,7 +951,7 @@ public class OptDigits {
 		System.out.println("-- Finish --\n");
 	}
 	
-	public static void crossThree(int blockLimit, int environmentLimit) {
+	public static void crossThree(int foldLimit, int environmentLimit, int n, int m, int tuples) {
 		
 		/* Random Mapping configuration
 		 * Intra-environment: different
@@ -988,31 +976,29 @@ public class OptDigits {
 		
 		System.out.println("-- Initializing experiments --\n");
 		
-		for(int i = 0; i < blockLimit; i++) {
+		for(int i = 1; i <= foldLimit; i++) {
 			
 			System.out.println("Block " + i);
 			
-			f1 = new File("Input/MNIST/CrossValidation/Results/R3/Block"+i+"AccuracyR3.txt");
+			f1 = new File("Input/OptDigits/10-fold/fold"+i+"/R3/AccuracyR3.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
-				WiSARD w0 = new WiSARD("w0", 28, 28, 28);
-				WiSARD w1 = new WiSARD("w1", 28, 28, 28);
-				WiSARD w01 = new WiSARD("w01", 28, 28, 28);
+				WiSARD w0 = new WiSARD("w0", n, m, tuples);
+				WiSARD w1 = new WiSARD("w1", n, m, tuples);
+				WiSARD w01 = new WiSARD("w01", n, m, tuples);
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/MNIST/CrossValidation/Results/R3/Block"+i+"env"+j+"R3.txt");
-				f3 = new File("Input/MNIST/CrossValidation/Block"+i+"/env"+j+".txt");
+				f2 = new File("Input/OptDigits/10-fold/fold"+i+"/R3/Env"+j+"MI.txt");
+				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
 				
 				try {
-					
-					//System.out.println("-- Training --\n");
 					
 					fr1 = new FileReader(f3);
 					br1 = new BufferedReader(fr1);
 					
-					for (int k = 0; k < 25000; k++) {
+					for (int k = 0; k < 2529; k++) {
 						
 						splitter = br1.readLine().toString().split(",");
 						example = new StringBuilder();
@@ -1026,7 +1012,7 @@ public class OptDigits {
 						w01.train(splitter[0], example.toString());
 					}
 					
-					for (int k = 25000; k < 50000; k++) {
+					for (int k = 2529; k < 5058; k++) {
 					
 						splitter = br1.readLine().toString().split(",");
 						example = new StringBuilder();
@@ -1039,14 +1025,12 @@ public class OptDigits {
 						w1.train(splitter[0], example.toString());
 						w01.train(splitter[0], example.toString());
 					}
-
-					//System.out.println("-- Testing --\n");
 					
 					c0 = 0;
 					c1 = 0;
 					c01 = 0;
 					
-					for (int k = 50000; k < 60000; k++) {
+					for (int k = 5058; k < 5620; k++) {
 						
 						splitter = br1.readLine().toString().split(",");
 						example = new StringBuilder();
@@ -1081,13 +1065,9 @@ public class OptDigits {
 					fw1 = new FileWriter(f1, true);
 					bw1 = new BufferedWriter(fw1);
 					
-					bw1.write(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) + "\n" );
+					bw1.write(j+","+ String.valueOf( (double) c0 / 562 ) + "," + String.valueOf( (double) c1 / 562 ) + "," + String.valueOf( (double) c01 / 562 ) + "\n" );
 					
 					bw1.close();
-					
-					//System.out.println(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) );
-					
-					//System.out.println("-- Mental Images --\n");
 					
 					w0.generateMentalImages();
 					w1.generateMentalImages();
