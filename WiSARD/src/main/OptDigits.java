@@ -8,9 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
@@ -33,13 +31,19 @@ public class OptDigits {
 		
 		//run();
 		
-		//crossZero(10,20, 8, 8, 16);
+		int foldLimit = 10,
+			envLimit = 20,
+			n = 8,
+			m = 8,
+			tuples = 8;
 		
-		//crossOne(10,20, 8, 8, 16);
+		crossZero(foldLimit,envLimit, n, m, tuples);
 		
-		//crossTwo(10,20, 8, 8, 16);
+		crossOne(foldLimit,envLimit, n, m, tuples);
 		
-		//crossThree(10,20, 8, 8, 16);
+		crossTwo(foldLimit,envLimit, n, m, tuples);
+		
+		crossThree(foldLimit,envLimit, n, m, tuples);
 		
 		endTime = System.nanoTime();
 		
@@ -54,10 +58,10 @@ public class OptDigits {
 		
 		for (int i = 1; i <= foldLimit; i++) {
 			
-			String trainName = "Input/OptDigits/10-fold/fold"+i+"/optdigits-10-"+i+"tra.dat", 
-				   testName = "Input/OptDigits/10-fold/fold"+i+"/optdigits-10-"+i+"tst.dat",
-				   outTrainName = "Input/OptDigits/10-fold/fold"+i+"/optdigits-10-"+i+"trabin.dat",
-				   outTestName = "Input/OptDigits/10-fold/fold"+i+"/optdigits-10-"+i+"tstbin.dat";
+			String trainName = "Input/CompressedOptDigits/10-fold/fold"+i+"/optdigits-10-"+i+"tra.dat", 
+				   testName = "Input/CompressedOptDigits/10-fold/fold"+i+"/optdigits-10-"+i+"tst.dat",
+				   outTrainName = "Input/CompressedOptDigits/10-fold/fold"+i+"/optdigits-10-"+i+"trabin.dat",
+				   outTestName = "Input/CompressedOptDigits/10-fold/fold"+i+"/optdigits-10-"+i+"tstbin.dat";
 			
 			StringBuilder example;
 			String[] splitter;
@@ -170,7 +174,7 @@ public class OptDigits {
 	
 	public static void run() {
 		
-		String fileNamePrefix ="Input/OptDigits/10-fold/fold",
+		String fileNamePrefix ="Input/CompressedOptDigits/10-fold/fold",
 			   fileNameTrainingSufix = "trabin.dat", fileNameTestingSufix = "tstbin.dat";
 		
 		String fullName;
@@ -238,7 +242,7 @@ public class OptDigits {
 					fr = new FileReader(testFile);
 					br = new BufferedReader(fr);
 					
-					file = new File("Input/OptDigits/10-fold/fold" + i + "/Env" + j + ".txt");
+					file = new File("Input/CompressedOptDigits/10-fold/fold" + i + "/Env" + j + ".txt");
 					
 					fw = new FileWriter(file);
 					bw = new BufferedWriter(fw);
@@ -325,13 +329,15 @@ public class OptDigits {
 		
 		String label;
 		
-		int c0, c1, c01;
+		ArrayList<String> testSet;
+		
+		int c0, c1, c01, c20, c21;
 		
 		System.out.println("-- Initializing experiments --\n");
 		
 		for(int i = 1; i <= foldLimit; i++) {
 			
-			f1 = new File("Input/OptDigits/10-fold/fold"+i+"/R0/AccuracyR0.txt");
+			f1 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R0/AccuracyR0.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
@@ -341,8 +347,10 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/OptDigits/10-fold/fold"+i+"/R0/Env"+j+"MI.txt");
-				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
+				f2 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R0/Env"+j+"MI.txt");
+				f3 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/Env"+j+".txt");
+				
+				testSet = new ArrayList<String>();
 				
 				try {
 					
@@ -387,7 +395,9 @@ public class OptDigits {
 					
 					for (int k = 5058; k < 5620; k++) {
 						
-						splitter = br1.readLine().toString().split(",");
+						testSet.add(br1.readLine().toString());
+						
+						splitter = testSet.get(k - 5058).split(",");
 						example = new StringBuilder();
 						
 						for (int l = 1; l < splitter.length; l++) {
@@ -416,17 +426,6 @@ public class OptDigits {
 							c01++;
 						}
 					}
-					
-					fw1 = new FileWriter(f1, true);
-					bw1 = new BufferedWriter(fw1);
-					
-					bw1.write(j+","+ String.valueOf( (double) c0 / 562 ) + "," + String.valueOf( (double) c1 / 562 ) + "," + String.valueOf( (double) c01 / 562 ) + "\n" );
-					
-					bw1.close();
-					
-					//System.out.println(j+","+ String.valueOf( (double) c0 / 10000 ) + "," + String.valueOf( (double) c1 / 10000 ) + "," + String.valueOf( (double) c01 / 10000 ) );
-					
-					//System.out.println("-- Mental Images --\n");
 					
 					w0.generateMentalImages();
 					w1.generateMentalImages();
@@ -497,6 +496,74 @@ public class OptDigits {
 						bw1.write(strB.toString() + "\n");
 					}
 										
+					bw1.close();
+					
+					w0.syntheticTrainingSet();
+					w1.syntheticTrainingSet();
+					
+					for (int k = 0; k < 1; k++) {
+						
+						int[][] w0Knownledge = w0.getSyntheticTrainingSet().get(String.valueOf(k)),
+								w1Knownledge = w1.getSyntheticTrainingSet().get(String.valueOf(k));
+						
+						StringBuilder prototype;
+								
+						for (int l = 0; l < w0Knownledge.length; l++) {
+							
+							prototype = new StringBuilder();
+							
+							for (int l2 = 0; l2 < w0Knownledge[0].length; l2++) {
+								prototype.append(w0Knownledge[l][l2]);
+							}
+						
+							w1.train(String.valueOf(k), prototype.toString());
+						}
+						
+						for (int l = 0; l < w1Knownledge.length; l++) {
+							
+							prototype = new StringBuilder();
+							
+							for (int l2 = 0; l2 < w1Knownledge[0].length; l2++) {
+								prototype.append(w1Knownledge[l][l2]);
+							}
+							
+							w0.train(String.valueOf(k), prototype.toString());
+						}
+					}
+					
+					c20 = 0;
+					c21 = 0;
+					
+					for (int k = 5058; k < 5620; k++) {
+						
+						splitter = testSet.get(k - 5058).split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						label = w0.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c20++;
+						}
+						
+						label = w1.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c21++;
+						}
+					}
+					
+					fw1 = new FileWriter(f1, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					bw1.write(j+"\t"+ String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\t"+ String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c21 / 562 ) + "\n" );
+					
 					bw1.close();
 					
 				} catch (FileNotFoundException e) {
@@ -534,7 +601,9 @@ public class OptDigits {
 		
 		String label;
 		
-		int c0, c1, c01;
+		int c0, c1, c01, c20, c21;
+		
+		ArrayList<String> testSet;
 		
 		System.out.println("-- Initializing experiments --\n");
 		
@@ -542,7 +611,7 @@ public class OptDigits {
 			
 			System.out.println("Block " + i);
 			
-			f1 = new File("Input/OptDigits/10-fold/fold"+i+"/R1/AccuracyR1.txt");
+			f1 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R1/AccuracyR1.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
@@ -580,8 +649,10 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/OptDigits/10-fold/fold"+i+"/R1/Env"+j+"MI.txt");
-				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
+				f2 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R1/Env"+j+"MI.txt");
+				f3 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/Env"+j+".txt");
+				
+				testSet = new ArrayList<String>();
 				
 				try {
 					
@@ -622,7 +693,9 @@ public class OptDigits {
 					
 					for (int k = 5058; k < 5620; k++) {
 						
-						splitter = br1.readLine().toString().split(",");
+						testSet.add(br1.readLine().toString());
+						
+						splitter = testSet.get(k - 5058).split(",");
 						example = new StringBuilder();
 						
 						for (int l = 1; l < splitter.length; l++) {
@@ -651,13 +724,6 @@ public class OptDigits {
 							c01++;
 						}
 					}
-					
-					fw1 = new FileWriter(f1, true);
-					bw1 = new BufferedWriter(fw1);
-					
-					bw1.write(j+","+ String.valueOf( (double) c0 / 562 ) + "," + String.valueOf( (double) c1 / 562 ) + "," + String.valueOf( (double) c01 / 562 ) + "\n" );
-					
-					bw1.close();
 					
 					w0.generateMentalImages();
 					w1.generateMentalImages();
@@ -728,6 +794,74 @@ public class OptDigits {
 						bw1.write(strB.toString() + "\n");
 					}
 										
+					bw1.close();
+					
+					w0.syntheticTrainingSet();
+					w1.syntheticTrainingSet();
+					
+					for (int k = 0; k < 1; k++) {
+						
+						int[][] w0Knownledge = w0.getSyntheticTrainingSet().get(String.valueOf(k)),
+								w1Knownledge = w1.getSyntheticTrainingSet().get(String.valueOf(k));
+						
+						StringBuilder prototype;
+								
+						for (int l = 0; l < w0Knownledge.length; l++) {
+							
+							prototype = new StringBuilder();
+							
+							for (int l2 = 0; l2 < w0Knownledge[0].length; l2++) {
+								prototype.append(w0Knownledge[l][l2]);
+							}
+						
+							w1.train(String.valueOf(k), prototype.toString());
+						}
+						
+						for (int l = 0; l < w1Knownledge.length; l++) {
+							
+							prototype = new StringBuilder();
+							
+							for (int l2 = 0; l2 < w1Knownledge[0].length; l2++) {
+								prototype.append(w1Knownledge[l][l2]);
+							}
+							
+							w0.train(String.valueOf(k), prototype.toString());
+						}
+					}
+					
+					c20 = 0;
+					c21 = 0;
+					
+					for (int k = 5058; k < 5620; k++) {
+						
+						splitter = testSet.get(k - 5058).split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						label = w0.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c20++;
+						}
+						
+						label = w1.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c21++;
+						}
+					}
+					
+					fw1 = new FileWriter(f1, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					bw1.write(j+"\t"+ String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\t"+ String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c21 / 562 ) + "\n" );
+					
 					bw1.close();
 					
 				} catch (FileNotFoundException e) {
@@ -765,7 +899,9 @@ public class OptDigits {
 		
 		String label;
 		
-		int c0, c1, c01;
+		int c0, c1, c01, c20, c21;
+		
+		ArrayList<String> testSet;
 		
 		System.out.println("-- Initializing experiments --\n");
 		
@@ -777,7 +913,7 @@ public class OptDigits {
 			
 			System.out.println("Block " + i);
 			
-			f1 = new File("Input/OptDigits/10-fold/fold"+i+"/R2/AccuracyR2.txt");
+			f1 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R2/AccuracyR2.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
@@ -787,8 +923,10 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/OptDigits/10-fold/fold"+i+"/R2/Env"+j+"MI.txt");
-				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
+				f2 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R2/Env"+j+"MI.txt");
+				f3 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/Env"+j+".txt");
+				
+				testSet = new ArrayList<String>();
 				
 				try {
 					
@@ -829,7 +967,9 @@ public class OptDigits {
 					
 					for (int k = 5058; k < 5620; k++) {
 						
-						splitter = br1.readLine().toString().split(",");
+						testSet.add(br1.readLine().toString());
+						
+						splitter = testSet.get(k - 5058).split(",");
 						example = new StringBuilder();
 						
 						for (int l = 1; l < splitter.length; l++) {
@@ -858,13 +998,6 @@ public class OptDigits {
 							c01++;
 						}
 					}
-					
-					fw1 = new FileWriter(f1, true);
-					bw1 = new BufferedWriter(fw1);
-					
-					bw1.write(j+","+ String.valueOf( (double) c0 / 562 ) + "," + String.valueOf( (double) c1 / 562 ) + "," + String.valueOf( (double) c01 / 562 ) + "\n" );
-					
-					bw1.close();
 					
 					w0.generateMentalImages();
 					w1.generateMentalImages();
@@ -935,6 +1068,74 @@ public class OptDigits {
 						bw1.write(strB.toString() + "\n");
 					}
 										
+					bw1.close();
+					
+					w0.syntheticTrainingSet();
+					w1.syntheticTrainingSet();
+					
+					for (int k = 0; k < 1; k++) {
+						
+						int[][] w0Knownledge = w0.getSyntheticTrainingSet().get(String.valueOf(k)),
+								w1Knownledge = w1.getSyntheticTrainingSet().get(String.valueOf(k));
+						
+						StringBuilder prototype;
+								
+						for (int l = 0; l < w0Knownledge.length; l++) {
+							
+							prototype = new StringBuilder();
+							
+							for (int l2 = 0; l2 < w0Knownledge[0].length; l2++) {
+								prototype.append(w0Knownledge[l][l2]);
+							}
+						
+							w1.train(String.valueOf(k), prototype.toString());
+						}
+						
+						for (int l = 0; l < w1Knownledge.length; l++) {
+							
+							prototype = new StringBuilder();
+							
+							for (int l2 = 0; l2 < w1Knownledge[0].length; l2++) {
+								prototype.append(w1Knownledge[l][l2]);
+							}
+							
+							w0.train(String.valueOf(k), prototype.toString());
+						}
+					}
+					
+					c20 = 0;
+					c21 = 0;
+					
+					for (int k = 5058; k < 5620; k++) {
+						
+						splitter = testSet.get(k - 5058).split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						label = w0.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c20++;
+						}
+						
+						label = w1.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c21++;
+						}
+					}
+					
+					fw1 = new FileWriter(f1, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					bw1.write(j+"\t"+ String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\t"+ String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c21 / 562 ) + "\n" );
+					
 					bw1.close();
 					
 				} catch (FileNotFoundException e) {
@@ -972,7 +1173,9 @@ public class OptDigits {
 		
 		String label;
 		
-		int c0, c1, c01;
+		int c0, c1, c01, c20, c21;
+		
+		ArrayList<String> testSet;
 		
 		System.out.println("-- Initializing experiments --\n");
 		
@@ -980,7 +1183,7 @@ public class OptDigits {
 			
 			System.out.println("Block " + i);
 			
-			f1 = new File("Input/OptDigits/10-fold/fold"+i+"/R3/AccuracyR3.txt");
+			f1 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R3/AccuracyR3.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
@@ -990,8 +1193,10 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/OptDigits/10-fold/fold"+i+"/R3/Env"+j+"MI.txt");
-				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
+				f2 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R3/Env"+j+"MI.txt");
+				f3 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/Env"+j+".txt");
+				
+				testSet = new ArrayList<String>();
 				
 				try {
 					
@@ -1032,7 +1237,9 @@ public class OptDigits {
 					
 					for (int k = 5058; k < 5620; k++) {
 						
-						splitter = br1.readLine().toString().split(",");
+						testSet.add(br1.readLine().toString());
+						
+						splitter = testSet.get(k - 5058).split(",");
 						example = new StringBuilder();
 						
 						for (int l = 1; l < splitter.length; l++) {
@@ -1061,13 +1268,6 @@ public class OptDigits {
 							c01++;
 						}
 					}
-					
-					fw1 = new FileWriter(f1, true);
-					bw1 = new BufferedWriter(fw1);
-					
-					bw1.write(j+","+ String.valueOf( (double) c0 / 562 ) + "," + String.valueOf( (double) c1 / 562 ) + "," + String.valueOf( (double) c01 / 562 ) + "\n" );
-					
-					bw1.close();
 					
 					w0.generateMentalImages();
 					w1.generateMentalImages();
@@ -1138,6 +1338,74 @@ public class OptDigits {
 						bw1.write(strB.toString() + "\n");
 					}
 										
+					bw1.close();
+					
+					w0.syntheticTrainingSet();
+					w1.syntheticTrainingSet();
+					
+					for (int k = 0; k < 1; k++) {
+						
+						int[][] w0Knownledge = w0.getSyntheticTrainingSet().get(String.valueOf(k)),
+								w1Knownledge = w1.getSyntheticTrainingSet().get(String.valueOf(k));
+						
+						StringBuilder prototype;
+								
+						for (int l = 0; l < w0Knownledge.length; l++) {
+							
+							prototype = new StringBuilder();
+							
+							for (int l2 = 0; l2 < w0Knownledge[0].length; l2++) {
+								prototype.append(w0Knownledge[l][l2]);
+							}
+						
+							w1.train(String.valueOf(k), prototype.toString());
+						}
+						
+						for (int l = 0; l < w1Knownledge.length; l++) {
+							
+							prototype = new StringBuilder();
+							
+							for (int l2 = 0; l2 < w1Knownledge[0].length; l2++) {
+								prototype.append(w1Knownledge[l][l2]);
+							}
+							
+							w0.train(String.valueOf(k), prototype.toString());
+						}
+					}
+					
+					c20 = 0;
+					c21 = 0;
+					
+					for (int k = 5058; k < 5620; k++) {
+						
+						splitter = testSet.get(k - 5058).split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						label = w0.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c20++;
+						}
+						
+						label = w1.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c21++;
+						}
+					}
+					
+					fw1 = new FileWriter(f1, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					bw1.write(j+"\t"+ String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\t"+ String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c21 / 562 ) + "\n" );
+					
 					bw1.close();
 					
 				} catch (FileNotFoundException e) {
