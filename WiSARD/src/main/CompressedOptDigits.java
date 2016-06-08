@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import model.Discriminator;
 import model.WiSARD;
 
-public class OptDigits {
+public class CompressedOptDigits {
 
 	public static long startTime;
 	public static long endTime;
@@ -35,7 +35,7 @@ public class OptDigits {
 			envLimit = 20,
 			n = 8,
 			m = 8,
-			tuples = 8;
+			tuples = 16;
 		
 		crossZero(foldLimit,envLimit, n, m, tuples);
 		
@@ -337,7 +337,7 @@ public class OptDigits {
 		
 		for(int i = 1; i <= foldLimit; i++) {
 			
-			f1 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R0/AccuracyR0.txt");
+			f1 = new File("Input/CompressedOptDigits/10-fold/results/R0/Accuracy-fold"+i+"R0.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
@@ -347,14 +347,16 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R0/Env"+j+"MI.txt");
+				f2 = new File("Input/CompressedOptDigits/10-fold/results/R0/fold"+i+"Env"+j+"MI.txt");
 				f3 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/Env"+j+".txt");
 				
 				testSet = new ArrayList<String>();
 				
 				try {
 					
-					//System.out.println("-- Training --\n");
+					/*
+					 * TRAINING PHASE
+					 * */
 					
 					fr1 = new FileReader(f3);
 					br1 = new BufferedReader(fr1);
@@ -387,7 +389,9 @@ public class OptDigits {
 						w01.train(splitter[0], example.toString());
 					}
 
-					//System.out.println("-- Testing --\n");
+					/*
+					 * TESTING PHASE
+					 * */
 					
 					c0 = 0;
 					c1 = 0;
@@ -426,6 +430,10 @@ public class OptDigits {
 							c01++;
 						}
 					}
+					
+					/*
+					 * MENTAL IMAGE GENERATION
+					 * */
 					
 					w0.generateMentalImages();
 					w1.generateMentalImages();
@@ -498,10 +506,14 @@ public class OptDigits {
 										
 					bw1.close();
 					
+					/*
+					 * MEMORY TRANSFER
+					 * */
+					
 					w0.syntheticTrainingSet();
 					w1.syntheticTrainingSet();
 					
-					for (int k = 0; k < 1; k++) {
+					for (int k = 0; k < 10; k++) {
 						
 						int[][] w0Knownledge = w0.getSyntheticTrainingSet().get(String.valueOf(k)),
 								w1Knownledge = w1.getSyntheticTrainingSet().get(String.valueOf(k));
@@ -562,7 +574,7 @@ public class OptDigits {
 					fw1 = new FileWriter(f1, true);
 					bw1 = new BufferedWriter(fw1);
 					
-					bw1.write(j+"\t"+ String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\t"+ String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c21 / 562 ) + "\n" );
+					bw1.write(j+"\t"+ String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t"+ String.valueOf( (double) c21 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\n" );
 					
 					bw1.close();
 					
@@ -611,7 +623,7 @@ public class OptDigits {
 			
 			System.out.println("Block " + i);
 			
-			f1 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R1/AccuracyR1.txt");
+			f1 = new File("Input/CompressedOptDigits/10-fold/results/R1/Accuracy-fold"+i+"R1.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
@@ -649,12 +661,16 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R1/Env"+j+"MI.txt");
+				f2 = new File("Input/CompressedOptDigits/10-fold/results/R1/fold"+i+"Env"+j+"MI.txt");
 				f3 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/Env"+j+".txt");
 				
 				testSet = new ArrayList<String>();
 				
 				try {
+					
+					/*
+					 * TRAINING PHASE
+					 * */
 					
 					fr1 = new FileReader(f3);
 					br1 = new BufferedReader(fr1);
@@ -686,6 +702,10 @@ public class OptDigits {
 						w1.train(splitter[0], example.toString());
 						w01.train(splitter[0], example.toString());
 					}
+					
+					/*
+					 * TESTING PHASE
+					 * */
 					
 					c0 = 0;
 					c1 = 0;
@@ -724,6 +744,10 @@ public class OptDigits {
 							c01++;
 						}
 					}
+					
+					/*
+					 * MENTAL IMAGE GENERATION
+					 * */
 					
 					w0.generateMentalImages();
 					w1.generateMentalImages();
@@ -796,10 +820,14 @@ public class OptDigits {
 										
 					bw1.close();
 					
+					/*
+					 * MEMORY TRANSFER
+					 * */
+					
 					w0.syntheticTrainingSet();
 					w1.syntheticTrainingSet();
 					
-					for (int k = 0; k < 1; k++) {
+					for (int k = 0; k < 10; k++) {
 						
 						int[][] w0Knownledge = w0.getSyntheticTrainingSet().get(String.valueOf(k)),
 								w1Knownledge = w1.getSyntheticTrainingSet().get(String.valueOf(k));
@@ -860,7 +888,7 @@ public class OptDigits {
 					fw1 = new FileWriter(f1, true);
 					bw1 = new BufferedWriter(fw1);
 					
-					bw1.write(j+"\t"+ String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\t"+ String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c21 / 562 ) + "\n" );
+					bw1.write(j+"\t"+ String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t"+ String.valueOf( (double) c21 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\n" );
 					
 					bw1.close();
 					
@@ -913,7 +941,7 @@ public class OptDigits {
 			
 			System.out.println("Block " + i);
 			
-			f1 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R2/AccuracyR2.txt");
+			f1 = new File("Input/CompressedOptDigits/10-fold/results/R2/Accuracy-fold"+i+"R2.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
@@ -923,12 +951,16 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R2/Env"+j+"MI.txt");
+				f2 = new File("Input/CompressedOptDigits/10-fold/results/R2/fold"+i+"Env"+j+"MI.txt");
 				f3 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/Env"+j+".txt");
 				
 				testSet = new ArrayList<String>();
 				
 				try {
+					
+					/*
+					 * TRAINING PHASE
+					 * */
 					
 					fr1 = new FileReader(f3);
 					br1 = new BufferedReader(fr1);
@@ -961,6 +993,10 @@ public class OptDigits {
 						w01.train(splitter[0], example.toString());
 					}
 
+					/*
+					 * TESTING PHASE
+					 * */
+					
 					c0 = 0;
 					c1 = 0;
 					c01 = 0;
@@ -998,6 +1034,10 @@ public class OptDigits {
 							c01++;
 						}
 					}
+					
+					/*
+					 * MENTAL IMAGE GENERATION
+					 * */
 					
 					w0.generateMentalImages();
 					w1.generateMentalImages();
@@ -1070,10 +1110,14 @@ public class OptDigits {
 										
 					bw1.close();
 					
+					/*
+					 * MEMORY TRANSFER
+					 * */
+					
 					w0.syntheticTrainingSet();
 					w1.syntheticTrainingSet();
 					
-					for (int k = 0; k < 1; k++) {
+					for (int k = 0; k < 10; k++) {
 						
 						int[][] w0Knownledge = w0.getSyntheticTrainingSet().get(String.valueOf(k)),
 								w1Knownledge = w1.getSyntheticTrainingSet().get(String.valueOf(k));
@@ -1183,7 +1227,7 @@ public class OptDigits {
 			
 			System.out.println("Block " + i);
 			
-			f1 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R3/AccuracyR3.txt");
+			f1 = new File("Input/CompressedOptDigits/10-fold/results/R3/Accuracy-fold"+i+"R3.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
@@ -1193,12 +1237,16 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/R3/Env"+j+"MI.txt");
+				f2 = new File("Input/CompressedOptDigits/10-fold/results/R3/fold"+i+"Env"+j+"MI.txt");
 				f3 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/Env"+j+".txt");
 				
 				testSet = new ArrayList<String>();
 				
 				try {
+					
+					/*
+					 * TRAINING PHASE
+					 * */
 					
 					fr1 = new FileReader(f3);
 					br1 = new BufferedReader(fr1);
@@ -1230,6 +1278,10 @@ public class OptDigits {
 						w1.train(splitter[0], example.toString());
 						w01.train(splitter[0], example.toString());
 					}
+					
+					/*
+					 * TESTING PHASE
+					 * */
 					
 					c0 = 0;
 					c1 = 0;
@@ -1268,6 +1320,10 @@ public class OptDigits {
 							c01++;
 						}
 					}
+					
+					/*
+					 * MENTAL IMAGE GENERATION
+					 * */
 					
 					w0.generateMentalImages();
 					w1.generateMentalImages();
@@ -1340,10 +1396,14 @@ public class OptDigits {
 										
 					bw1.close();
 					
+					/*
+					 * MEMORY TRANSFER
+					 * */
+					
 					w0.syntheticTrainingSet();
 					w1.syntheticTrainingSet();
 					
-					for (int k = 0; k < 1; k++) {
+					for (int k = 0; k < 10; k++) {
 						
 						int[][] w0Knownledge = w0.getSyntheticTrainingSet().get(String.valueOf(k)),
 								w1Knownledge = w1.getSyntheticTrainingSet().get(String.valueOf(k));
