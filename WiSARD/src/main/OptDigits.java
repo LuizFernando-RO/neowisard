@@ -31,21 +31,19 @@ public class OptDigits {
 		
 		//run();
 		
-		int foldLimit = 1,
-			envLimit = 1,
+		int foldLimit = 10,
+			envLimit = 20,
 			n = 32,
 			m = 32,
 			tuples = 32;
 		
+		//crossZero(foldLimit,envLimit, n, m, tuples);
 		
+		crossOne(foldLimit,envLimit, n, m, tuples);
 		
-		crossZero(foldLimit,envLimit, n, m, tuples);
+		crossTwo(foldLimit,envLimit, n, m, tuples);
 		
-		//crossOne(foldLimit,envLimit, n, m, tuples);
-		
-		//crossTwo(foldLimit,envLimit, n, m, tuples);
-		
-		//crossThree(foldLimit,envLimit, n, m, tuples);
+		crossThree(foldLimit,envLimit, n, m, tuples);
 		
 		endTime = System.nanoTime();
 		
@@ -90,13 +88,11 @@ public class OptDigits {
 					
 					for (int k = 0; k < 32; k++) {
 						
-						example.append(rawExample.charAt(k) + ",");
+						example.append("," + rawExample.charAt(k));
 					}
 				}
 				
-				example.append(br.readLine().trim());
-				
-				dataset[i] = example.toString();
+				dataset[i] = br.readLine().trim() + example.toString();
 			}
 			
 			for (int i = 0; i < 10; i++) {
@@ -499,14 +495,7 @@ public class OptDigits {
 					w0.syntheticTrainingSet();
 					w1.syntheticTrainingSet();
 					
-					int[][] w0Knownledge = w0.getSyntheticTrainingSet().get("0");
-					
-					System.out.println(w0Knownledge.length);
-					System.out.println(w0Knownledge[0].length);
-					
-					/*
-					
-					for (int k = 1; k < 10; k++) {
+					for (int k = 0; k < 10; k++) {
 						
 						int[][] w0Knownledge = w0.getSyntheticTrainingSet().get(String.valueOf(k)),
 								w1Knownledge = w1.getSyntheticTrainingSet().get(String.valueOf(k));
@@ -570,7 +559,7 @@ public class OptDigits {
 					
 					bw1.write(j+"\t"+ String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t"+ String.valueOf( (double) c21 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\n" );
 					
-					bw1.close();*/
+					bw1.close();
 					
 				} catch (FileNotFoundException e) {
 					
@@ -655,8 +644,8 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/CompressedOptDigits/10-fold/results/R1/fold"+i+"Env"+j+"MI.txt");
-				f3 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/Env"+j+".txt");
+				f2 = new File("Input/OptDigits/10-fold/results/R1/fold"+i+"Env"+j+"MI.txt");
+				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
 				
 				testSet = new ArrayList<String>();
 				
@@ -935,7 +924,7 @@ public class OptDigits {
 			
 			System.out.println("Block " + i);
 			
-			f1 = new File("Input/CompressedOptDigits/10-fold/results/R2/Accuracy-fold"+i+"R2.txt");
+			f1 = new File("Input/OptDigits/10-fold/results/R2/Accuracy-fold"+i+"R2.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
@@ -945,8 +934,8 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/CompressedOptDigits/10-fold/results/R2/fold"+i+"Env"+j+"MI.txt");
-				f3 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/Env"+j+".txt");
+				f2 = new File("Input/OptDigits/10-fold/results/R2/fold"+i+"Env"+j+"MI.txt");
+				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
 				
 				testSet = new ArrayList<String>();
 				
@@ -1221,7 +1210,7 @@ public class OptDigits {
 			
 			System.out.println("Block " + i);
 			
-			f1 = new File("Input/CompressedOptDigits/10-fold/results/R3/Accuracy-fold"+i+"R3.txt");
+			f1 = new File("Input/OptDigits/10-fold/results/R3/Accuracy-fold"+i+"R3.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
@@ -1231,8 +1220,8 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/CompressedOptDigits/10-fold/results/R3/fold"+i+"Env"+j+"MI.txt");
-				f3 = new File("Input/CompressedOptDigits/10-fold/fold"+i+"/Env"+j+".txt");
+				f2 = new File("Input/OptDigits/10-fold/results/R3/fold"+i+"Env"+j+"MI.txt");
+				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
 				
 				testSet = new ArrayList<String>();
 				

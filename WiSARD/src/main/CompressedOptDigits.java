@@ -31,19 +31,19 @@ public class CompressedOptDigits {
 		
 		//run();
 		
-		int foldLimit = 10,
-			envLimit = 20,
+		int foldLimit = 1,
+			envLimit = 1,
 			n = 8,
 			m = 8,
 			tuples = 16;
 		
 		crossZero(foldLimit,envLimit, n, m, tuples);
 		
-		crossOne(foldLimit,envLimit, n, m, tuples);
+		//crossOne(foldLimit,envLimit, n, m, tuples);
 		
-		crossTwo(foldLimit,envLimit, n, m, tuples);
+		//crossTwo(foldLimit,envLimit, n, m, tuples);
 		
-		crossThree(foldLimit,envLimit, n, m, tuples);
+		//crossThree(foldLimit,envLimit, n, m, tuples);
 		
 		endTime = System.nanoTime();
 		
@@ -51,8 +51,6 @@ public class CompressedOptDigits {
 	}
 	
 	public static void binarize() {
-		
-		int[] vector = {0,8,16,16,16,16,16,16,5,16,16,16,16,16,16,15,5,16,16,16,16,16,16,8,1,16,16,16,16,16,16,2,1,15,16,16,16,16,14,0,7,16,16,16,16,16,16,6,10,16,16,16,16,16,16,13,1,10,16,16,16,16,16,16};
 		
 		int foldLimit = 10, trainLimit = 5058, testLimit = 562;
 		
@@ -163,10 +161,11 @@ public class CompressedOptDigits {
 				bw.close();
 				
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
+				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
