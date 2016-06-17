@@ -1,5 +1,8 @@
 package main;
 
+import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,6 +14,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 import model.Discriminator;
 import model.WiSARD;
@@ -31,19 +38,23 @@ public class OptDigits {
 		
 		//run();
 		
+		
 		int foldLimit = 10,
 			envLimit = 20,
 			n = 32,
 			m = 32,
 			tuples = 32;
 		
+		
 		//crossZero(foldLimit,envLimit, n, m, tuples);
 		
-		crossOne(foldLimit,envLimit, n, m, tuples);
+		//crossOne(foldLimit,envLimit, n, m, tuples);
 		
-		crossTwo(foldLimit,envLimit, n, m, tuples);
+		//crossTwo(foldLimit,envLimit, n, m, tuples);
 		
-		crossThree(foldLimit,envLimit, n, m, tuples);
+		//crossThree(foldLimit,envLimit, n, m, tuples);
+		
+		imageAnalysis(n, m);
 		
 		endTime = System.nanoTime();
 		
@@ -1609,6 +1620,138 @@ public class OptDigits {
 		System.out.println("Accuracy: " + counter + " / " + testingSize + " : " + (((float) counter / testingSize) * 100 ) + "%");
 		
 		System.out.println("\n-- Testing phase finished successfully --");
+	}
+	
+	public static void imageAnalysis(int width, int height) {
+	
+		ArrayList<int[]> w0Images = new ArrayList<int[]>();
+		ArrayList<int[]> w1Images = new ArrayList<int[]>();
+		ArrayList<int[]> w01Images = new ArrayList<int[]>();
+		
+		/*
+		 * READ FILE
+		 * */
+		
+		File f = new File("Input/OptDigits/10-fold/results/R0/fold1Env0MI.txt");
+		FileReader fr;
+		BufferedReader br;
+		
+		try {
+			fr = new FileReader(f);
+			br = new BufferedReader(fr);			
+			
+			for (int i = 0; i < 10; i++) {
+				
+				String[] aux1 = br.readLine().split(",");
+				
+				int[] aux2 = new int[width*height];
+				
+				for (int j = 0; j < aux2.length; j++) {
+					
+					aux2[j] = Integer.valueOf(aux1[j+1]);
+				}
+				
+				w0Images.add(aux2);
+			}
+			
+			for (int i = 0; i < 10; i++) {
+				
+				String[] aux1 = br.readLine().split(",");
+				
+				int[] aux2 = new int[width*height];
+				
+				for (int j = 0; j < aux2.length; j++) {
+					
+					aux2[j] = Integer.valueOf(aux1[j+1]);
+				}
+				
+				w1Images.add(aux2);
+			}
+	
+			for (int i = 0; i < 10; i++) {
+				
+				String[] aux1 = br.readLine().split(",");
+				
+				int[] aux2 = new int[width*height];
+				
+				for (int j = 0; j < aux2.length; j++) {
+					
+					aux2[j] = Integer.valueOf(aux1[j+1]);
+				}
+				
+				w01Images.add(aux2);
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		/*
+		 * PROJECT IMAGE
+		 * */
+		
+		int[] image1 = w0Images.get(1);
+		int[] image2 = w1Images.get(1);
+		int[] image3 = new int[image1.length];
+		int[] image4 = new int[image1.length];
+		
+		for (int i = 0; i < image3.length; i++) {
+			
+			image3[i] = image1[i] - image2[i];
+		}
+		
+		for (int i = 0; i < image3.length; i++) {
+			
+			image4[i] = image2[i] - image1[i];
+		}
+		
+		plot(width, height, image1, "w0");
+		plot(width, height, image2, "w1");
+		plot(width, height, image3, "w0 - w1");
+		plot(width, height, image4, "w1 - w0");
+	}
+	
+	public static void plot(int width, int height, int[] image, String title) {
+		
+		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		
+		for (int x = 0; x < img.getWidth(); x++) {
+		    for (int y = 0; y < img.getHeight(); y++)
+		    {
+		        int grayLevel = image[x*width+y];
+		        
+		        if(grayLevel > 255)
+		        	
+		        	grayLevel = 255;
+		        
+		        if(grayLevel < 0)
+		        	
+		        	grayLevel = 0;
+		        
+		        grayLevel = Math.abs(255 - grayLevel);
+		        
+		        int gray = (grayLevel << 16) + (grayLevel << 8) + grayLevel;
+		        
+		        img.setRGB( y, x, gray);
+		    }
+		}
+		
+		ImageIcon icon = new ImageIcon(img);
+		
+		Image newImg = icon.getImage();
+		Image bigImg = newImg.getScaledInstance(10*img.getWidth(), 10*img.getHeight(),  java.awt.Image.SCALE_SMOOTH);
+		ImageIcon newIcon = new ImageIcon(bigImg);
+				
+        JFrame frame = new JFrame();
+        frame.setLayout(new FlowLayout());
+        frame.setSize(10*img.getWidth()+50,10*img.getHeight()+50);
+        JLabel lbl = new JLabel();
+        lbl.setIcon(newIcon);
+        frame.add(lbl);
+        frame.setTitle(title);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
 	// Computes the time spent
