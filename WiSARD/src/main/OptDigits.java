@@ -40,13 +40,13 @@ public class OptDigits {
 		//run();
 		
 		
-		int foldLimit = 1,
-			envLimit = 1,
+		int foldLimit = 10,
+			envLimit = 20,
 			n = 32,
 			m = 32,
 			tuples = 32;
 		
-		//crossZero2(foldLimit,envLimit, n, m, tuples);
+		crossZero2(foldLimit,envLimit, n, m, tuples, 4);
 		
 		//crossZero(foldLimit,envLimit, n, m, tuples);
 		
@@ -56,7 +56,7 @@ public class OptDigits {
 		
 		//crossThree(foldLimit,envLimit, n, m, tuples);
 		
-		imageAnalysis(n, m);
+		//imageAnalysis(n, m);
 		
 		endTime = System.nanoTime();
 		
@@ -264,7 +264,7 @@ public class OptDigits {
 		
 	}
 		
-	public static void crossZero2(int foldLimit, int environmentLimit, int n, int m, int tuples) {
+	public static void crossZero2(int foldLimit, int environmentLimit, int n, int m, int tuples, int threshold) {
 		
 		/* Random Mapping configuration
 		 * Intra-environment: equal
@@ -326,7 +326,7 @@ public class OptDigits {
 		
 		for(int i = 1; i <= foldLimit; i++) {
 			
-			f1 = new File("Input/OptDigits/10-fold/results/R0/Accuracy-fold"+i+"R0.txt");
+			f1 = new File("Input/OptDigits/10-fold/resultsLimiar/"+ threshold +"/R0/Accuracy-fold"+i+"R0.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
@@ -336,7 +336,7 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/OptDigits/10-fold/results/R0/fold"+i+"Env"+j+"MI.txt");
+				f2 = new File("Input/OptDigits/10-fold/resultsLimiar/"+threshold+"/R0/fold"+i+"Env"+j+"MI.txt");
 				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
 				
 				testSet = new ArrayList<String>();
@@ -508,8 +508,6 @@ public class OptDigits {
 					w0.syntheticTrainingSet();
 					w1.syntheticTrainingSet();
 					
-					int count;
-					
 					int[] w0counter0 = new int[10];
 					int[] w1counter0 = new int[10];
 					
@@ -531,9 +529,7 @@ public class OptDigits {
 						
 						System.out.println("w0knowledge: " + w0Knownledge.length);
 						System.out.println("w1knowledge: " + w1Knownledge.length);
-						
-						count = 0;
-						
+												
 						for (int l = 0; l < w0Knownledge.length; l++) {
 							
 							prototype = new StringBuilder();
@@ -553,23 +549,41 @@ public class OptDigits {
 							
 							if(sum != 0) {
 								
-								if( ((m1-m2)/ (double) sum) < 0.8 ) {
+								if( ((m1-m2)/ (double) sum) < (10 / (double) threshold) ) {
+									
+									w1.train(String.valueOf(k), prototype.toString());
 									
 									w1counter0[k]++;
 								}
 								
-								if( ((m1-m2)/ (double) sum) < 0.6 ) {
+								/*if( ((m1-m2)/ (double) sum) < 0.6 ) {
+									
+									w1.train(String.valueOf(k), prototype.toString());
 									
 									w1counter1[k]++;
 								}
 								
 								if( ((m1-m2)/ (double) sum) < 0.4 ) {
 									
+									w1.train(String.valueOf(k), prototype.toString());
+									
 									w1counter2[k]++;
-								}
+								}*/
 							}
 							
+							else {
+									
+								w1.train(String.valueOf(k), prototype.toString());
+								
+								w1counter0[k]++;
+								w1counter1[k]++;
+								w1counter2[k]++;
+							}
+								
+							
 							if(Integer.valueOf(cl) != k) {
+								
+								w1.train(String.valueOf(k), prototype.toString());
 								
 								w1counter0[k]++;
 								w1counter1[k]++;
@@ -595,23 +609,40 @@ public class OptDigits {
 							
 							if(sum != 0) {
 								
-								if( ((m1-m2)/ (double) sum) < 0.8 ) {
+								if( ((m1-m2)/ (double) sum) < (10 / (double) threshold) ) {
+									
+									w0.train(String.valueOf(k), prototype.toString());
 									
 									w0counter0[k]++;
 								}
-								
+								/*
 								if( ((m1-m2)/ (double) sum) < 0.6 ) {
+									
+									w0.train(String.valueOf(k), prototype.toString());
 									
 									w0counter1[k]++;
 								}
 								
 								if( ((m1-m2)/ (double) sum) < 0.4 ) {
 									
+									w0.train(String.valueOf(k), prototype.toString());
+									
 									w0counter2[k]++;
-								}
+								}*/
+							}
+							
+							else {
+								
+								w0.train(String.valueOf(k), prototype.toString());
+								
+								w0counter0[k]++;
+								w0counter1[k]++;
+								w0counter2[k]++;
 							}
 							
 							if(Integer.valueOf(cl) != k) {
+								
+								w0.train(String.valueOf(k), prototype.toString());
 								
 								w0counter0[k]++;
 								w0counter1[k]++;
@@ -624,6 +655,7 @@ public class OptDigits {
 						
 					}
 					
+					/*
 					for (int o = 0; o < 10; o++) {
 						
 						System.out.print(w0counter0[o] + "\t");
@@ -653,7 +685,7 @@ public class OptDigits {
 						
 						System.out.print(w1counter2[o] + "\t");
 					}
-					System.out.println();
+					System.out.println();*/
 					
 					c20 = 0;
 					c21 = 0;
@@ -686,7 +718,7 @@ public class OptDigits {
 					fw1 = new FileWriter(f1, true);
 					bw1 = new BufferedWriter(fw1);
 					
-					bw1.write(j+"\t"+ String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t"+ String.valueOf( (double) c21 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\n" );
+					bw1.write(String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t"+ String.valueOf( (double) c21 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\n" );
 					
 					bw1.close();
 					
