@@ -12,6 +12,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import main.OptDigits;
+
 public class WiSARD {
 	
 	private int tuples;
@@ -213,9 +215,11 @@ public class WiSARD {
 		
 		boolean draw = true;
 		
+		int[] similarity = null;
+		
 		while(draw && b < getMaxBleaching()) {
 		
-			int[] similarity = new int[map.size()];
+			similarity = new int[map.size()];
 		
 			Iterator<Entry<String, Discriminator>> iterador = map.entrySet().iterator();
 		
@@ -278,6 +282,129 @@ public class WiSARD {
 		label = rel1.get(maxIndex);
 		
 		return label;
+	}
+	
+	public String test2(String test) {
+		
+		if(!getValid()) {
+			
+			System.out.println("I can't work on this configuration, sorry!");
+			
+			return "";
+		}
+		
+		String label = "";
+		
+		StringBuilder value;
+		int l;
+		int maxIndex = 0;
+		
+		int b = 0;
+		
+		boolean draw = true;
+		
+		int[] similarity = null;
+		
+		while(draw && b < getMaxBleaching()) {
+		
+			similarity = new int[map.size()];
+		
+			Iterator<Entry<String, Discriminator>> iterador = map.entrySet().iterator();
+		
+			while(iterador.hasNext()) {
+			
+				Entry<String, Discriminator> elemento = iterador.next();
+			
+				l = 0;
+			
+				for (int j = 0; j < elemento.getValue().getTuplas().size(); j = j + getTuples()) {
+				
+					value = new StringBuilder();
+				
+					for (int k = j; k < j + getTuples(); k++)
+					
+						value.append(test.charAt(map.get(elemento.getKey()).getTuplas().get(k)));
+				
+					if(map.get(elemento.getKey()).getRams().get(l).getMapa().get(value.toString()) != null ) {
+						
+						
+						
+						if(map.get(elemento.getKey()).getRams().get(l).getMapa().get(value.toString()) > b)
+							
+							similarity[rel2.get(elemento.getKey())]++;
+				
+					}
+					
+					l++;
+				}
+			}
+		
+			maxIndex = 0;
+			int maxValue = similarity[0];
+			int occurrences = 0;
+		
+			for (int j = 1; j < similarity.length; j++) {
+			
+				if(similarity[j] > similarity[maxIndex]) {
+				
+					maxIndex = j;
+					maxValue = similarity[j];
+				
+					occurrences = 0;
+				}
+			
+				if(similarity[j] == maxValue)
+				
+					occurrences++;
+			}
+		
+			if(occurrences > 1) 
+			
+				b++;
+				
+			else
+			
+				draw = false;
+		}
+		
+		label = rel1.get(maxIndex);
+		
+		int m1 = 0, m2 = 0, sum = similarity[0];
+		
+		for (int i = 1; i < similarity.length; i++) {
+			
+			sum += similarity[i];
+			
+			if(similarity[i] >= similarity[m1]){
+				
+				m1 = i;
+			}
+		}
+		
+		for (int i = 0; i < similarity.length; i++) {
+			
+			if(similarity[i] >= similarity[m2] && i != m1)
+				
+				m2 = i;
+		}
+		
+		//String response = label + ";" + similarity[m1] + ";" + similarity[m2] + ";" + sum;
+		String response = label + "\t" + similarity[m1] + "\t" + similarity[m2] + "\t" + sum;
+		
+		/*if(sum == 0)
+			
+			System.out.println(test);
+		
+		System.out.print(response + "\t");
+		
+		for (int i = 0; i < similarity.length; i++) {
+			
+			System.out.print(similarity[i] + "\t");
+		}
+		
+		System.out.println(label);*/
+		
+		return response;
 	}
 	
 	public void generateMentalImages() {
