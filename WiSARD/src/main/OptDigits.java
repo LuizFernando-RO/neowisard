@@ -63,6 +63,8 @@ public class OptDigits {
 		System.out.println("\n-- Execution time: " + duration() + "ms --");
 	}
 	
+	/* Domain */
+	
 	public static void prepare() {
 			
 		String inFileName, trainFileName, testFileName;
@@ -263,8 +265,135 @@ public class OptDigits {
 		}
 		
 	}
+	
+	public static void train(WiSARD w1, int trainingSize, String path) {
 		
-	public static void crossZero2(int foldLimit, int environmentLimit, int n, int m, int tuples, int threshold) {
+		System.out.println("-- Initializing training phase --\n");
+		
+		int m = 28;
+		
+		StringBuilder example;
+		String[] splitter;
+		String label;
+		
+		File f;
+		FileReader fr;
+		BufferedReader br;
+
+		f = new File(path);
+		
+		try {
+			
+			fr = new FileReader(f);
+			br = new BufferedReader(fr);
+		
+			for(int i = 0; i < trainingSize; i++) {
+				
+				example = new StringBuilder();
+				
+				splitter = br.readLine().trim().split(",");
+	
+				label = splitter[0];
+				
+				for(int j = 1; j < m*m + 1; j++) {
+					
+					if(Integer.valueOf(splitter[j]) > 0)
+						
+						example.append("1");
+					
+					else
+						
+						example.append("0");
+				}
+				
+				w1.train(label, example.toString());
+			}
+			
+			br.close();
+			
+		} catch (FileNotFoundException e) {
+			
+			System.out.println("File not found!");
+			
+		} catch (IOException e) {
+			
+			System.out.println("Error!");
+		}
+		
+		System.out.println("Max Bleaching = " + w1.getMaxBleaching());
+		
+		System.out.println("\n-- Training phase finished successfully --\n");
+	}
+	
+	public static void test(WiSARD w1, int testingSize, String path) {
+		
+		System.out.println("-- Initializing testing phase --\n");
+		
+		int m = 28;
+		
+		StringBuilder example;
+		String[] splitter;
+		String label, result = "";
+		int counter = 0;
+		
+		File f;
+		FileReader fr;
+		BufferedReader br;
+		
+		f = new File(path);
+		
+		try {
+			
+			fr = new FileReader(f);
+			br = new BufferedReader(fr);
+		
+			for(int i = 0; i < testingSize; i++) {
+				
+				example = new StringBuilder();
+				
+				splitter = br.readLine().trim().split(",");
+	
+				label = splitter[0];
+				
+				for(int j = 1; j < m*m + 1; j++) {
+					
+					if(Integer.valueOf(splitter[j]) > 0)
+						
+						example.append("1");
+					
+					else
+						
+						example.append("0");
+				}
+				
+				result = w1.test(example.toString());
+				
+				if(result.equals(label))
+					
+					counter++;
+			}
+			
+			br.close();
+			
+		} catch (FileNotFoundException e) {
+			
+			System.out.println("File not found!");
+			
+		} catch (IOException e) {
+			
+			System.out.println("Error!");
+		}
+		
+		System.out.println("Accuracy: " + counter + " / " + testingSize + " : " + (((float) counter / testingSize) * 100 ) + "%");
+		
+		System.out.println("\n-- Testing phase finished successfully --");
+	}
+	
+	/* Two thresholds */
+	
+	public static void crossZero4(int foldLimit, int environmentLimit, int n, int m, int tuples, int threshold, int upperThreshold) {
+		
+		System.out.println("-- Experiments with lower and upper threshold --");
 		
 		/* Random Mapping configuration
 		 * Intra-environment: equal
@@ -735,6 +864,960 @@ public class OptDigits {
 		
 		System.out.println("-- Finish --\n");
 	}
+	
+	/* Transferring differences */
+	
+	public static void crossZero3(int foldLimit, int environmentLimit, int n, int m, int tuples, int threshold) {
+		
+		System.out.println("-- Experiments with transferring only differences --");
+		
+		/* Random Mapping configuration
+		 * Intra-environment: equal
+		 * Inter-environment: equal
+		 */
+		
+		System.out.println("-- Test Reference: 0 --\n");
+		
+		WiSARD w0 = new WiSARD("w0", n, m, tuples);
+		WiSARD w1 = new WiSARD("w1", n, m, tuples);
+		WiSARD w01 = new WiSARD("w01", n, m, tuples);
+		
+		String[] labels = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+		
+		for (int i = 0; i < labels.length; i++) {
+			
+			Discriminator discriminator = new Discriminator(n, m);
+			discriminator.setId(labels[i]);
+			
+			Discriminator discriminator1 = new Discriminator(n, m);
+			discriminator1.setId(labels[i]);
+			
+			Discriminator discriminator2 = new Discriminator(n, m);
+			discriminator2.setId(labels[i]);
+			
+			discriminator1.setTuplas(discriminator.getTuplas());
+			discriminator2.setTuplas(discriminator.getTuplas());
+			
+			w0.getMap().put(labels[i], discriminator);
+			w0.getRel1().put(w0.getRel1().size(), labels[i]);
+			w0.getRel2().put(labels[i], w0.getRel2().size());
+			
+			w1.getMap().put(labels[i], discriminator1);
+			w1.getRel1().put(w1.getRel1().size(), labels[i]);
+			w1.getRel2().put(labels[i], w1.getRel2().size());
+			
+			w01.getMap().put(labels[i], discriminator2);
+			w01.getRel1().put(w01.getRel1().size(), labels[i]);
+			w01.getRel2().put(labels[i], w01.getRel2().size());
+		}
+		
+		File f1, f2, f3;
+		FileReader fr1;
+		BufferedReader br1;
+		
+		FileWriter fw1;
+		BufferedWriter bw1;
+		
+		StringBuilder example;
+		String[] splitter;
+		
+		String label;
+		
+		ArrayList<String> testSet;
+		
+		int c0, c1, c01, c20, c21;
+		
+		System.out.println("-- Initializing experiments --\n");
+		
+		for(int i = 1; i <= foldLimit; i++) {
+			
+			f1 = new File("Input/OptDigits/10-fold/resultsLimiar/"+ threshold +"/R0/Accuracy-fold"+i+"R0.txt");
+			
+			for (int j = 0; j < environmentLimit; j++) {
+				
+				w0.clear();
+				w1.clear();
+				w01.clear();
+				
+				System.out.println("Environment " + j);
+				
+				f2 = new File("Input/OptDigits/10-fold/resultsLimiar/"+threshold+"/R0/fold"+i+"Env"+j+"MI.txt");
+				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
+				
+				testSet = new ArrayList<String>();
+				
+				try {
+					
+					/*
+					 * TRAINING PHASE
+					 * */
+					
+					System.out.println("-- Training --");
+					
+					fr1 = new FileReader(f3);
+					br1 = new BufferedReader(fr1);
+					
+					for (int k = 0; k < 2529; k++) {
+						
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						w0.train(splitter[0], example.toString());
+						w01.train(splitter[0], example.toString());
+					}
+					
+					for (int k = 2529; k < 5058; k++) {
+					
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						w1.train(splitter[0], example.toString());
+						w01.train(splitter[0], example.toString());
+					}
+
+					/*
+					 * TESTING PHASE
+					 * */
+					
+					c0 = 0;
+					c1 = 0;
+					c01 = 0;
+					
+					for (int k = 5058; k < 5620; k++) {
+						
+						testSet.add(br1.readLine().toString());
+						
+						splitter = testSet.get(k - 5058).split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						label = w0.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c0++;
+						}
+						
+						label = w1.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c1++;
+						}
+
+						label = w01.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c01++;
+						}
+					}
+					
+					/*
+					 * MENTAL IMAGE GENERATION
+					 * */
+					
+					System.out.println("-- Testing --");
+					
+					w0.generateMentalImages();
+					w1.generateMentalImages();
+					w01.generateMentalImages();
+					
+					fw1 = new FileWriter(f2, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					StringBuilder strB;
+					
+					Iterator<Entry<String, int[]>> iterator = w0.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+					
+					iterator = w1.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+					
+					iterator = w01.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+										
+					bw1.close();
+					
+					/*
+					 * MEMORY TRANSFER
+					 * */
+					
+					System.out.println("-- Memory Transfer --");
+					
+					w0.syntheticTrainingSet();
+					w1.syntheticTrainingSet();
+					
+					int[] w0counter0 = new int[10];
+					int[] w1counter0 = new int[10];
+					
+					int[] w0counter1 = new int[10];
+					int[] w1counter1 = new int[10];
+					
+					int[] w0counter2 = new int[10];
+					int[] w1counter2 = new int[10];
+					
+					// Alterar aqui para treinar com todo o conjunto
+					for (int k = 0; k < 10; k++) {	
+						
+						//System.out.println(k);
+					
+						int[][] w0Knownledge = w0.getSyntheticTrainingSet().get(String.valueOf(k)),
+								w1Knownledge = w1.getSyntheticTrainingSet().get(String.valueOf(k));
+						
+						StringBuilder prototype;
+						
+						System.out.println("w0knowledge: " + w0Knownledge.length);
+						System.out.println("w1knowledge: " + w1Knownledge.length);
+												
+						for (int l = 0; l < w0Knownledge.length; l++) {
+							
+							prototype = new StringBuilder();
+							
+							for (int l2 = 0; l2 < w0Knownledge[0].length; l2++) {
+								
+								prototype.append(w0Knownledge[l][l2]);
+							}
+							
+							//Alterar aqui parar ver a resposta da rede frente às amostras
+							
+							String str = w1.test2(prototype.toString());							
+							String[] spl = str.split("\t");
+							
+							String cl = spl[0];
+							int m1 = Integer.valueOf(spl[1]), m2 = Integer.valueOf(spl[2]), sum = Integer.valueOf(spl[3]);
+							
+							if(sum != 0) {
+								
+								if( ((m1-m2)/ (double) sum) < (10 / (double) threshold) ) {
+									
+									w1.train(String.valueOf(k), prototype.toString());
+									
+									w1counter0[k]++;
+								}
+								
+								/*if( ((m1-m2)/ (double) sum) < 0.6 ) {
+									
+									w1.train(String.valueOf(k), prototype.toString());
+									
+									w1counter1[k]++;
+								}
+								
+								if( ((m1-m2)/ (double) sum) < 0.4 ) {
+									
+									w1.train(String.valueOf(k), prototype.toString());
+									
+									w1counter2[k]++;
+								}*/
+							}
+							
+							else {
+									
+								w1.train(String.valueOf(k), prototype.toString());
+								
+								w1counter0[k]++;
+								w1counter1[k]++;
+								w1counter2[k]++;
+							}
+								
+							
+							if(Integer.valueOf(cl) != k) {
+								
+								w1.train(String.valueOf(k), prototype.toString());
+								
+								w1counter0[k]++;
+								w1counter1[k]++;
+								w1counter2[k]++;
+							}
+							
+							//w1.train(String.valueOf(k), prototype.toString());
+						}
+						
+						for (int l = 0; l < w1Knownledge.length; l++) {
+							
+							prototype = new StringBuilder();
+							
+							for (int l2 = 0; l2 < w1Knownledge[0].length; l2++) {
+								prototype.append(w1Knownledge[l][l2]);
+							}
+							
+							String str = w0.test2(prototype.toString());							
+							String[] spl = str.split("\t");
+							
+							String cl = spl[0];
+							int m1 = Integer.valueOf(spl[1]), m2 = Integer.valueOf(spl[2]), sum = Integer.valueOf(spl[3]);
+							
+							if(sum != 0) {
+								
+								if( ((m1-m2)/ (double) sum) < (10 / (double) threshold) ) {
+									
+									w0.train(String.valueOf(k), prototype.toString());
+									
+									w0counter0[k]++;
+								}
+								/*
+								if( ((m1-m2)/ (double) sum) < 0.6 ) {
+									
+									w0.train(String.valueOf(k), prototype.toString());
+									
+									w0counter1[k]++;
+								}
+								
+								if( ((m1-m2)/ (double) sum) < 0.4 ) {
+									
+									w0.train(String.valueOf(k), prototype.toString());
+									
+									w0counter2[k]++;
+								}*/
+							}
+							
+							else {
+								
+								w0.train(String.valueOf(k), prototype.toString());
+								
+								w0counter0[k]++;
+								w0counter1[k]++;
+								w0counter2[k]++;
+							}
+							
+							if(Integer.valueOf(cl) != k) {
+								
+								w0.train(String.valueOf(k), prototype.toString());
+								
+								w0counter0[k]++;
+								w0counter1[k]++;
+								w0counter2[k]++;
+							}
+							
+							//w0.train(String.valueOf(k), prototype.toString());
+						}
+						
+						
+					}
+					
+					/*
+					for (int o = 0; o < 10; o++) {
+						
+						System.out.print(w0counter0[o] + "\t");
+					}
+					System.out.println();
+					for (int o = 0; o < 10; o++) {
+						
+						System.out.print(w1counter0[o] + "\t");
+					}
+					System.out.println();
+					for (int o = 0; o < 10; o++) {
+						
+						System.out.print(w0counter1[o] + "\t");
+					}
+					System.out.println();
+					for (int o = 0; o < 10; o++) {
+						
+						System.out.print(w1counter1[o] + "\t");
+					}
+					System.out.println();
+					for (int o = 0; o < 10; o++) {
+						
+						System.out.print(w0counter2[o] + "\t");
+					}
+					System.out.println();
+					for (int o = 0; o < 10; o++) {
+						
+						System.out.print(w1counter2[o] + "\t");
+					}
+					System.out.println();*/
+					
+					c20 = 0;
+					c21 = 0;
+					
+					for (int k = 5058; k < 5620; k++) {
+						
+						splitter = testSet.get(k - 5058).split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						label = w0.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c20++;
+						}
+						
+						label = w1.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c21++;
+						}
+					}
+					
+					fw1 = new FileWriter(f1, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					bw1.write(String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t"+ String.valueOf( (double) c21 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\n" );
+					
+					bw1.close();
+					
+				} catch (FileNotFoundException e) {
+					
+					e.printStackTrace();
+					
+				} catch (IOException e) {
+					
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		System.out.println("-- Finish --\n");
+	}	
+	
+	/* Threshold analysis */
+	
+	public static void crossZero2(int foldLimit, int environmentLimit, int n, int m, int tuples, int threshold) {
+		
+		System.out.println("-- Experiments with threshold --");
+		
+		/* Random Mapping configuration
+		 * Intra-environment: equal
+		 * Inter-environment: equal
+		 */
+		
+		System.out.println("-- Test Reference: 0 --\n");
+		
+		WiSARD w0 = new WiSARD("w0", n, m, tuples);
+		WiSARD w1 = new WiSARD("w1", n, m, tuples);
+		WiSARD w01 = new WiSARD("w01", n, m, tuples);
+		
+		String[] labels = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+		
+		for (int i = 0; i < labels.length; i++) {
+			
+			Discriminator discriminator = new Discriminator(n, m);
+			discriminator.setId(labels[i]);
+			
+			Discriminator discriminator1 = new Discriminator(n, m);
+			discriminator1.setId(labels[i]);
+			
+			Discriminator discriminator2 = new Discriminator(n, m);
+			discriminator2.setId(labels[i]);
+			
+			discriminator1.setTuplas(discriminator.getTuplas());
+			discriminator2.setTuplas(discriminator.getTuplas());
+			
+			w0.getMap().put(labels[i], discriminator);
+			w0.getRel1().put(w0.getRel1().size(), labels[i]);
+			w0.getRel2().put(labels[i], w0.getRel2().size());
+			
+			w1.getMap().put(labels[i], discriminator1);
+			w1.getRel1().put(w1.getRel1().size(), labels[i]);
+			w1.getRel2().put(labels[i], w1.getRel2().size());
+			
+			w01.getMap().put(labels[i], discriminator2);
+			w01.getRel1().put(w01.getRel1().size(), labels[i]);
+			w01.getRel2().put(labels[i], w01.getRel2().size());
+		}
+		
+		File f1, f2, f3;
+		FileReader fr1;
+		BufferedReader br1;
+		
+		FileWriter fw1;
+		BufferedWriter bw1;
+		
+		StringBuilder example;
+		String[] splitter;
+		
+		String label;
+		
+		ArrayList<String> testSet;
+		
+		int c0, c1, c01, c20, c21;
+		
+		System.out.println("-- Initializing experiments --\n");
+		
+		for(int i = 1; i <= foldLimit; i++) {
+			
+			f1 = new File("Input/OptDigits/10-fold/resultsLimiar/"+ threshold +"/R0/Accuracy-fold"+i+"R0.txt");
+			
+			for (int j = 0; j < environmentLimit; j++) {
+				
+				w0.clear();
+				w1.clear();
+				w01.clear();
+				
+				System.out.println("Environment " + j);
+				
+				f2 = new File("Input/OptDigits/10-fold/resultsLimiar/"+threshold+"/R0/fold"+i+"Env"+j+"MI.txt");
+				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
+				
+				testSet = new ArrayList<String>();
+				
+				try {
+					
+					/*
+					 * TRAINING PHASE
+					 * */
+					
+					System.out.println("-- Training --");
+					
+					fr1 = new FileReader(f3);
+					br1 = new BufferedReader(fr1);
+					
+					for (int k = 0; k < 2529; k++) {
+						
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						w0.train(splitter[0], example.toString());
+						w01.train(splitter[0], example.toString());
+					}
+					
+					for (int k = 2529; k < 5058; k++) {
+					
+						splitter = br1.readLine().toString().split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						w1.train(splitter[0], example.toString());
+						w01.train(splitter[0], example.toString());
+					}
+
+					/*
+					 * TESTING PHASE
+					 * */
+					
+					c0 = 0;
+					c1 = 0;
+					c01 = 0;
+					
+					for (int k = 5058; k < 5620; k++) {
+						
+						testSet.add(br1.readLine().toString());
+						
+						splitter = testSet.get(k - 5058).split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						label = w0.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c0++;
+						}
+						
+						label = w1.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c1++;
+						}
+
+						label = w01.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c01++;
+						}
+					}
+					
+					/*
+					 * MENTAL IMAGE GENERATION
+					 * */
+					
+					System.out.println("-- Testing --");
+					
+					w0.generateMentalImages();
+					w1.generateMentalImages();
+					w01.generateMentalImages();
+					
+					fw1 = new FileWriter(f2, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					StringBuilder strB;
+					
+					Iterator<Entry<String, int[]>> iterator = w0.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+					
+					iterator = w1.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+					
+					iterator = w01.getMentalImage().entrySet().iterator();
+					
+					while(iterator.hasNext()) {
+						
+						Entry<String, int[]> element = iterator.next();
+						
+						strB = new StringBuilder();
+						
+						strB.append(element.getKey() + ",");
+						
+						for (int l = 0; l < element.getValue().length - 1; l++) {
+							
+							strB.append(String.valueOf(element.getValue()[l]) + ",");
+						}
+						
+						strB.append(String.valueOf(element.getValue()[element.getValue().length - 1]));
+						
+						bw1.write(strB.toString() + "\n");
+					}
+										
+					bw1.close();
+					
+					/*
+					 * MEMORY TRANSFER
+					 * */
+					
+					System.out.println("-- Memory Transfer --");
+					
+					w0.syntheticTrainingSet();
+					w1.syntheticTrainingSet();
+					
+					int[] w0counter0 = new int[10];
+					int[] w1counter0 = new int[10];
+					
+					int[] w0counter1 = new int[10];
+					int[] w1counter1 = new int[10];
+					
+					int[] w0counter2 = new int[10];
+					int[] w1counter2 = new int[10];
+					
+					// Alterar aqui para treinar com todo o conjunto
+					for (int k = 0; k < 10; k++) {	
+						
+						//System.out.println(k);
+					
+						int[][] w0Knownledge = w0.getSyntheticTrainingSet().get(String.valueOf(k)),
+								w1Knownledge = w1.getSyntheticTrainingSet().get(String.valueOf(k));
+						
+						StringBuilder prototype;
+						
+						System.out.println("w0knowledge: " + w0Knownledge.length);
+						System.out.println("w1knowledge: " + w1Knownledge.length);
+												
+						for (int l = 0; l < w0Knownledge.length; l++) {
+							
+							prototype = new StringBuilder();
+							
+							for (int l2 = 0; l2 < w0Knownledge[0].length; l2++) {
+								
+								prototype.append(w0Knownledge[l][l2]);
+							}
+							
+							//Alterar aqui parar ver a resposta da rede frente às amostras
+							
+							String str = w1.test2(prototype.toString());							
+							String[] spl = str.split("\t");
+							
+							String cl = spl[0];
+							int m1 = Integer.valueOf(spl[1]), m2 = Integer.valueOf(spl[2]), sum = Integer.valueOf(spl[3]);
+							
+							if(sum != 0) {
+								
+								if( ((m1-m2)/ (double) sum) < (10 / (double) threshold) ) {
+									
+									w1.train(String.valueOf(k), prototype.toString());
+									
+									w1counter0[k]++;
+								}
+								
+								/*if( ((m1-m2)/ (double) sum) < 0.6 ) {
+									
+									w1.train(String.valueOf(k), prototype.toString());
+									
+									w1counter1[k]++;
+								}
+								
+								if( ((m1-m2)/ (double) sum) < 0.4 ) {
+									
+									w1.train(String.valueOf(k), prototype.toString());
+									
+									w1counter2[k]++;
+								}*/
+							}
+							
+							else {
+									
+								w1.train(String.valueOf(k), prototype.toString());
+								
+								w1counter0[k]++;
+								w1counter1[k]++;
+								w1counter2[k]++;
+							}
+								
+							
+							if(Integer.valueOf(cl) != k) {
+								
+								w1.train(String.valueOf(k), prototype.toString());
+								
+								w1counter0[k]++;
+								w1counter1[k]++;
+								w1counter2[k]++;
+							}
+							
+							//w1.train(String.valueOf(k), prototype.toString());
+						}
+						
+						for (int l = 0; l < w1Knownledge.length; l++) {
+							
+							prototype = new StringBuilder();
+							
+							for (int l2 = 0; l2 < w1Knownledge[0].length; l2++) {
+								prototype.append(w1Knownledge[l][l2]);
+							}
+							
+							String str = w0.test2(prototype.toString());							
+							String[] spl = str.split("\t");
+							
+							String cl = spl[0];
+							int m1 = Integer.valueOf(spl[1]), m2 = Integer.valueOf(spl[2]), sum = Integer.valueOf(spl[3]);
+							
+							if(sum != 0) {
+								
+								if( ((m1-m2)/ (double) sum) < (10 / (double) threshold) ) {
+									
+									w0.train(String.valueOf(k), prototype.toString());
+									
+									w0counter0[k]++;
+								}
+								/*
+								if( ((m1-m2)/ (double) sum) < 0.6 ) {
+									
+									w0.train(String.valueOf(k), prototype.toString());
+									
+									w0counter1[k]++;
+								}
+								
+								if( ((m1-m2)/ (double) sum) < 0.4 ) {
+									
+									w0.train(String.valueOf(k), prototype.toString());
+									
+									w0counter2[k]++;
+								}*/
+							}
+							
+							else {
+								
+								w0.train(String.valueOf(k), prototype.toString());
+								
+								w0counter0[k]++;
+								w0counter1[k]++;
+								w0counter2[k]++;
+							}
+							
+							if(Integer.valueOf(cl) != k) {
+								
+								w0.train(String.valueOf(k), prototype.toString());
+								
+								w0counter0[k]++;
+								w0counter1[k]++;
+								w0counter2[k]++;
+							}
+							
+							//w0.train(String.valueOf(k), prototype.toString());
+						}
+						
+						
+					}
+					
+					/*
+					for (int o = 0; o < 10; o++) {
+						
+						System.out.print(w0counter0[o] + "\t");
+					}
+					System.out.println();
+					for (int o = 0; o < 10; o++) {
+						
+						System.out.print(w1counter0[o] + "\t");
+					}
+					System.out.println();
+					for (int o = 0; o < 10; o++) {
+						
+						System.out.print(w0counter1[o] + "\t");
+					}
+					System.out.println();
+					for (int o = 0; o < 10; o++) {
+						
+						System.out.print(w1counter1[o] + "\t");
+					}
+					System.out.println();
+					for (int o = 0; o < 10; o++) {
+						
+						System.out.print(w0counter2[o] + "\t");
+					}
+					System.out.println();
+					for (int o = 0; o < 10; o++) {
+						
+						System.out.print(w1counter2[o] + "\t");
+					}
+					System.out.println();*/
+					
+					c20 = 0;
+					c21 = 0;
+					
+					for (int k = 5058; k < 5620; k++) {
+						
+						splitter = testSet.get(k - 5058).split(",");
+						example = new StringBuilder();
+						
+						for (int l = 1; l < splitter.length; l++) {
+							
+							example.append(splitter[l]);
+						}
+						
+						label = w0.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c20++;
+						}
+						
+						label = w1.test(example.toString());
+						
+						if(label.equals(splitter[0])) {
+							
+							c21++;
+						}
+					}
+					
+					fw1 = new FileWriter(f1, true);
+					bw1 = new BufferedWriter(fw1);
+					
+					bw1.write(String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t"+ String.valueOf( (double) c21 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\n" );
+					
+					bw1.close();
+					
+				} catch (FileNotFoundException e) {
+					
+					e.printStackTrace();
+					
+				} catch (IOException e) {
+					
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		System.out.println("-- Finish --\n");
+	}
+		
+	/* Classical Memory Transfer */
 	
 	public static void crossZero(int foldLimit, int environmentLimit, int n, int m, int tuples) {
 		
@@ -1950,6 +3033,8 @@ public class OptDigits {
 		System.out.println("-- Finish --\n");
 	}
 	
+	/* Other */
+	
 	public static void allCombinations(StringBuilder combination, int set1, int set2, int limit) {
 		
 		if(combination.length() == limit) {
@@ -1973,128 +3058,7 @@ public class OptDigits {
 		}
 	}
 	
-	public static void train(WiSARD w1, int trainingSize, String path) {
-		
-		System.out.println("-- Initializing training phase --\n");
-		
-		int m = 28;
-		
-		StringBuilder example;
-		String[] splitter;
-		String label;
-		
-		File f;
-		FileReader fr;
-		BufferedReader br;
-
-		f = new File(path);
-		
-		try {
-			
-			fr = new FileReader(f);
-			br = new BufferedReader(fr);
-		
-			for(int i = 0; i < trainingSize; i++) {
-				
-				example = new StringBuilder();
-				
-				splitter = br.readLine().trim().split(",");
-	
-				label = splitter[0];
-				
-				for(int j = 1; j < m*m + 1; j++) {
-					
-					if(Integer.valueOf(splitter[j]) > 0)
-						
-						example.append("1");
-					
-					else
-						
-						example.append("0");
-				}
-				
-				w1.train(label, example.toString());
-			}
-			
-			br.close();
-			
-		} catch (FileNotFoundException e) {
-			
-			System.out.println("File not found!");
-			
-		} catch (IOException e) {
-			
-			System.out.println("Error!");
-		}
-		
-		System.out.println("Max Bleaching = " + w1.getMaxBleaching());
-		
-		System.out.println("\n-- Training phase finished successfully --\n");
-	}
-	
-	public static void test(WiSARD w1, int testingSize, String path) {
-		
-		System.out.println("-- Initializing testing phase --\n");
-		
-		int m = 28;
-		
-		StringBuilder example;
-		String[] splitter;
-		String label, result = "";
-		int counter = 0;
-		
-		File f;
-		FileReader fr;
-		BufferedReader br;
-		
-		f = new File(path);
-		
-		try {
-			
-			fr = new FileReader(f);
-			br = new BufferedReader(fr);
-		
-			for(int i = 0; i < testingSize; i++) {
-				
-				example = new StringBuilder();
-				
-				splitter = br.readLine().trim().split(",");
-	
-				label = splitter[0];
-				
-				for(int j = 1; j < m*m + 1; j++) {
-					
-					if(Integer.valueOf(splitter[j]) > 0)
-						
-						example.append("1");
-					
-					else
-						
-						example.append("0");
-				}
-				
-				result = w1.test(example.toString());
-				
-				if(result.equals(label))
-					
-					counter++;
-			}
-			
-			br.close();
-			
-		} catch (FileNotFoundException e) {
-			
-			System.out.println("File not found!");
-			
-		} catch (IOException e) {
-			
-			System.out.println("Error!");
-		}
-		
-		System.out.println("Accuracy: " + counter + " / " + testingSize + " : " + (((float) counter / testingSize) * 100 ) + "%");
-		
-		System.out.println("\n-- Testing phase finished successfully --");
-	}
+	/* Image Processing */
 	
 	public static void imageAnalysis(int width, int height) {
 	
