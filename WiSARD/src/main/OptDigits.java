@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -40,13 +41,17 @@ public class OptDigits {
 		//run();
 		
 		
-		int foldLimit = 10,
-			envLimit = 20,
+		int foldLimit = 1,
+			envLimit = 1,
 			n = 32,
 			m = 32,
 			tuples = 32;
 		
-		crossZero2(foldLimit,envLimit, n, m, tuples, 4);
+		//crossZero2(foldLimit,envLimit, n, m, tuples, 4);
+		
+		crossZero3(foldLimit,envLimit, n, m, tuples, 4);
+		
+		//crossZero4(foldLimit,envLimit, n, m, tuples, 4, 4);
 		
 		//crossZero(foldLimit,envLimit, n, m, tuples);
 		
@@ -389,6 +394,7 @@ public class OptDigits {
 		System.out.println("\n-- Testing phase finished successfully --");
 	}
 	
+	//
 	/* Two thresholds */
 	
 	public static void crossZero4(int foldLimit, int environmentLimit, int n, int m, int tuples, int threshold, int upperThreshold) {
@@ -865,6 +871,7 @@ public class OptDigits {
 		System.out.println("-- Finish --\n");
 	}
 	
+	//
 	/* Transferring differences */
 	
 	public static void crossZero3(int foldLimit, int environmentLimit, int n, int m, int tuples, int threshold) {
@@ -931,7 +938,7 @@ public class OptDigits {
 		
 		for(int i = 1; i <= foldLimit; i++) {
 			
-			f1 = new File("Input/OptDigits/10-fold/resultsLimiar/"+ threshold +"/R0/Accuracy-fold"+i+"R0.txt");
+			f1 = new File("Input/OptDigits/10-fold/resultsDifferences/R0/Accuracy-fold"+i+"R0.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
@@ -941,7 +948,7 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/OptDigits/10-fold/resultsLimiar/"+threshold+"/R0/fold"+i+"Env"+j+"MI.txt");
+				f2 = new File("Input/OptDigits/10-fold/resultsDifferences/R0/fold"+i+"Env"+j+"MI.txt");
 				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
 				
 				testSet = new ArrayList<String>();
@@ -989,6 +996,8 @@ public class OptDigits {
 					 * TESTING PHASE
 					 * */
 					
+					System.out.println("-- Testing --");
+					
 					c0 = 0;
 					c1 = 0;
 					c01 = 0;
@@ -1031,7 +1040,7 @@ public class OptDigits {
 					 * MENTAL IMAGE GENERATION
 					 * */
 					
-					System.out.println("-- Testing --");
+					System.out.println("-- Mental Image Generation --");
 					
 					w0.generateMentalImages();
 					w1.generateMentalImages();
@@ -1110,222 +1119,81 @@ public class OptDigits {
 					
 					System.out.println("-- Memory Transfer --");
 					
-					w0.syntheticTrainingSet();
-					w1.syntheticTrainingSet();
+					//For each mental image, get the difference
 					
-					int[] w0counter0 = new int[10];
-					int[] w1counter0 = new int[10];
+					int[] w0Image, w1Image, diffImage;
+					ArrayList<Integer> temp;
 					
-					int[] w0counter1 = new int[10];
-					int[] w1counter1 = new int[10];
-					
-					int[] w0counter2 = new int[10];
-					int[] w1counter2 = new int[10];
-					
-					// Alterar aqui para treinar com todo o conjunto
-					for (int k = 0; k < 10; k++) {	
+					for (int k = 0; k < 1; k++) {
 						
-						//System.out.println(k);
-					
-						int[][] w0Knownledge = w0.getSyntheticTrainingSet().get(String.valueOf(k)),
-								w1Knownledge = w1.getSyntheticTrainingSet().get(String.valueOf(k));
+						ArrayList<Integer> temp2 = w0.getMap().get("0").getTuplas();
 						
-						StringBuilder prototype;
-						
-						System.out.println("w0knowledge: " + w0Knownledge.length);
-						System.out.println("w1knowledge: " + w1Knownledge.length);
-												
-						for (int l = 0; l < w0Knownledge.length; l++) {
+						for (int l = 0; l < temp2.size(); l++) {
 							
-							prototype = new StringBuilder();
+							System.out.print(l + "\t");							
+						}
+						
+						System.out.println();
+						
+						for (int l = 0; l < temp2.size(); l++) {
 							
-							for (int l2 = 0; l2 < w0Knownledge[0].length; l2++) {
+							System.out.print(temp2.get(l) + "\t");							
+						}
+						
+						w0Image = w0.getMentalImage().get(String.valueOf(k));
+						w1Image = w1.getMentalImage().get(String.valueOf(k));
+						
+						diffImage = new int[w0Image.length];
+						
+						for (int k2 = 0; k2 < w1Image.length; k2++) {
+							diffImage[k2] = w0Image[k2] - w1Image[k2];
+						}
+						
+						for (int k2 = 0; k2 < w1Image.length; k2++) {
+							
+							//w1 has something to offer to w0
+							if(diffImage[k2] < 0) {
 								
-								prototype.append(w0Knownledge[l][l2]);
-							}
-							
-							//Alterar aqui parar ver a resposta da rede frente às amostras
-							
-							String str = w1.test2(prototype.toString());							
-							String[] spl = str.split("\t");
-							
-							String cl = spl[0];
-							int m1 = Integer.valueOf(spl[1]), m2 = Integer.valueOf(spl[2]), sum = Integer.valueOf(spl[3]);
-							
-							if(sum != 0) {
+								temp = w0.getMap().get(String.valueOf(k)).getTuplas();
 								
-								if( ((m1-m2)/ (double) sum) < (10 / (double) threshold) ) {
+								int index = 0;
+								
+								for (int l = 0; l < temp.size(); l++) {
 									
-									w1.train(String.valueOf(k), prototype.toString());
-									
-									w1counter0[k]++;
+									if(temp.get(l) == k2) {
+										
+										index = l;
+										l = temp.size();
+									}
 								}
 								
-								/*if( ((m1-m2)/ (double) sum) < 0.6 ) {
+								System.out.println("-" + k2 + " is on " + index);
+								
+								int ram = index / tuples;
+								
+								HashMap<String, Integer> tempMap = w0.getMap().get(String.valueOf(k)).getRams().get(ram).getMapa();
+								
+								System.out.println(tempMap.size());
+							}
+
+							//w0 has something to offer to w1
+							if(diffImage[k2] > 0) {
+								
+								temp = w1.getMap().get(String.valueOf(k)).getTuplas();
+								
+								for (int l = 0; l < temp.size(); l++) {
 									
-									w1.train(String.valueOf(k), prototype.toString());
-									
-									w1counter1[k]++;
+									if(temp.get(l) == k2) {
+										
+										index = l;
+										l = temp.size();
+									}
 								}
 								
-								if( ((m1-m2)/ (double) sum) < 0.4 ) {
-									
-									w1.train(String.valueOf(k), prototype.toString());
-									
-									w1counter2[k]++;
-								}*/
+								System.out.println("+" + k2 + " is on " + index);
 							}
-							
-							else {
-									
-								w1.train(String.valueOf(k), prototype.toString());
-								
-								w1counter0[k]++;
-								w1counter1[k]++;
-								w1counter2[k]++;
-							}
-								
-							
-							if(Integer.valueOf(cl) != k) {
-								
-								w1.train(String.valueOf(k), prototype.toString());
-								
-								w1counter0[k]++;
-								w1counter1[k]++;
-								w1counter2[k]++;
-							}
-							
-							//w1.train(String.valueOf(k), prototype.toString());
-						}
-						
-						for (int l = 0; l < w1Knownledge.length; l++) {
-							
-							prototype = new StringBuilder();
-							
-							for (int l2 = 0; l2 < w1Knownledge[0].length; l2++) {
-								prototype.append(w1Knownledge[l][l2]);
-							}
-							
-							String str = w0.test2(prototype.toString());							
-							String[] spl = str.split("\t");
-							
-							String cl = spl[0];
-							int m1 = Integer.valueOf(spl[1]), m2 = Integer.valueOf(spl[2]), sum = Integer.valueOf(spl[3]);
-							
-							if(sum != 0) {
-								
-								if( ((m1-m2)/ (double) sum) < (10 / (double) threshold) ) {
-									
-									w0.train(String.valueOf(k), prototype.toString());
-									
-									w0counter0[k]++;
-								}
-								/*
-								if( ((m1-m2)/ (double) sum) < 0.6 ) {
-									
-									w0.train(String.valueOf(k), prototype.toString());
-									
-									w0counter1[k]++;
-								}
-								
-								if( ((m1-m2)/ (double) sum) < 0.4 ) {
-									
-									w0.train(String.valueOf(k), prototype.toString());
-									
-									w0counter2[k]++;
-								}*/
-							}
-							
-							else {
-								
-								w0.train(String.valueOf(k), prototype.toString());
-								
-								w0counter0[k]++;
-								w0counter1[k]++;
-								w0counter2[k]++;
-							}
-							
-							if(Integer.valueOf(cl) != k) {
-								
-								w0.train(String.valueOf(k), prototype.toString());
-								
-								w0counter0[k]++;
-								w0counter1[k]++;
-								w0counter2[k]++;
-							}
-							
-							//w0.train(String.valueOf(k), prototype.toString());
-						}
-						
-						
-					}
-					
-					/*
-					for (int o = 0; o < 10; o++) {
-						
-						System.out.print(w0counter0[o] + "\t");
-					}
-					System.out.println();
-					for (int o = 0; o < 10; o++) {
-						
-						System.out.print(w1counter0[o] + "\t");
-					}
-					System.out.println();
-					for (int o = 0; o < 10; o++) {
-						
-						System.out.print(w0counter1[o] + "\t");
-					}
-					System.out.println();
-					for (int o = 0; o < 10; o++) {
-						
-						System.out.print(w1counter1[o] + "\t");
-					}
-					System.out.println();
-					for (int o = 0; o < 10; o++) {
-						
-						System.out.print(w0counter2[o] + "\t");
-					}
-					System.out.println();
-					for (int o = 0; o < 10; o++) {
-						
-						System.out.print(w1counter2[o] + "\t");
-					}
-					System.out.println();*/
-					
-					c20 = 0;
-					c21 = 0;
-					
-					for (int k = 5058; k < 5620; k++) {
-						
-						splitter = testSet.get(k - 5058).split(",");
-						example = new StringBuilder();
-						
-						for (int l = 1; l < splitter.length; l++) {
-							
-							example.append(splitter[l]);
-						}
-						
-						label = w0.test(example.toString());
-						
-						if(label.equals(splitter[0])) {
-							
-							c20++;
-						}
-						
-						label = w1.test(example.toString());
-						
-						if(label.equals(splitter[0])) {
-							
-							c21++;
-						}
-					}
-					
-					fw1 = new FileWriter(f1, true);
-					bw1 = new BufferedWriter(fw1);
-					
-					bw1.write(String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t"+ String.valueOf( (double) c21 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\n" );
-					
-					bw1.close();
+						}						
+					}					
 					
 				} catch (FileNotFoundException e) {
 					
@@ -1341,6 +1209,7 @@ public class OptDigits {
 		System.out.println("-- Finish --\n");
 	}	
 	
+	//25%
 	/* Threshold analysis */
 	
 	public static void crossZero2(int foldLimit, int environmentLimit, int n, int m, int tuples, int threshold) {
@@ -1817,7 +1686,8 @@ public class OptDigits {
 		System.out.println("-- Finish --\n");
 	}
 		
-	/* Classical Memory Transfer */
+	// done
+	/* Classical Memory Transfer */ 
 	
 	public static void crossZero(int foldLimit, int environmentLimit, int n, int m, int tuples) {
 		
