@@ -2646,9 +2646,7 @@ public class OptDigits {
 		
 		for(int i = 1; i <= foldLimit; i++) {
 			
-			System.out.println("Block " + i);
-			
-			f1 = new File("Input/OptDigits/10-fold/results/R3/Accuracy-fold"+i+"R3.txt");
+			f1 = new File("Input/OptDigits/10-fold/results/Accuracy-fold"+i+"R3.txt");
 			
 			for (int j = 0; j < environmentLimit; j++) {
 				
@@ -2658,7 +2656,7 @@ public class OptDigits {
 				
 				System.out.println("Environment " + j);
 				
-				f2 = new File("Input/OptDigits/10-fold/results/R3/fold"+i+"Env"+j+"MI.txt");
+				f2 = new File("Input/OptDigits/10-fold/results/fold"+i+"Env"+j+"MI.txt");
 				f3 = new File("Input/OptDigits/10-fold/fold"+i+"/Env"+j+".txt");
 				
 				testSet = new ArrayList<String>();
@@ -2668,6 +2666,8 @@ public class OptDigits {
 					/*
 					 * TRAINING PHASE
 					 * */
+					
+					System.out.println("-- Training --");
 					
 					fr1 = new FileReader(f3);
 					br1 = new BufferedReader(fr1);
@@ -2745,6 +2745,8 @@ public class OptDigits {
 					/*
 					 * MENTAL IMAGE GENERATION
 					 * */
+					 
+					System.out.println("-- Testing --");
 					
 					w0.generateMentalImages();
 					w1.generateMentalImages();
@@ -2820,6 +2822,8 @@ public class OptDigits {
 					/*
 					 * MEMORY TRANSFER
 					 * */
+					 
+					System.out.println("-- Memory Transfer --");
 					
 					w0.syntheticTrainingSet();
 					w1.syntheticTrainingSet();
@@ -2836,6 +2840,7 @@ public class OptDigits {
 							prototype = new StringBuilder();
 							
 							for (int l2 = 0; l2 < w0Knownledge[0].length; l2++) {
+							
 								prototype.append(w0Knownledge[l][l2]);
 							}
 						
@@ -2885,7 +2890,7 @@ public class OptDigits {
 					fw1 = new FileWriter(f1, true);
 					bw1 = new BufferedWriter(fw1);
 					
-					bw1.write(j+"\t"+ String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\t"+ String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c21 / 562 ) + "\n" );
+					bw1.write(j+"\t"+ String.valueOf( (double) c0 / 562 ) + "\t" + String.valueOf( (double) c20 / 562 ) + "\t" + String.valueOf( (double) c1 / 562 ) + "\t"+ String.valueOf( (double) c21 / 562 ) + "\t" + String.valueOf( (double) c01 / 562 ) + "\n" );
 					
 					bw1.close();
 					
@@ -2899,7 +2904,7 @@ public class OptDigits {
 				}
 			}
 		}
-		
+			
 		System.out.println("-- Finish --\n");
 	}
 	
