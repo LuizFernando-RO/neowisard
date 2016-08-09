@@ -24,7 +24,7 @@ import javax.swing.JLabel;
 import model.Discriminator;
 import model.WiSARD;
 
-public class OptDigits {
+public class HeartDisease {
 
 	public static long startTime;
 	public static long endTime;
@@ -47,13 +47,21 @@ public class OptDigits {
 			m = 32,
 			tuples = 32;
 		
-		memoryTransfer(foldLimit,envLimit, n, m, tuples);
+		//crossZero2(foldLimit,envLimit, n, m, tuples, 4);
 		
-		memoryTransferThreshold(foldLimit, envLimit, n, m, tuples, 4);
+		crossZero3(foldLimit,envLimit, n, m, tuples, 4);
 		
-		memoryTransferThreshold(foldLimit, envLimit, n, m, tuples, 6);
+		//crossZero4(foldLimit,envLimit, n, m, tuples, 4, 4);
 		
-		memoryTransferThreshold(foldLimit, envLimit, n, m, tuples, 8);
+		//crossZero(foldLimit,envLimit, n, m, tuples);
+		
+		//crossOne(foldLimit,envLimit, n, m, tuples);
+		
+		//crossTwo(foldLimit,envLimit, n, m, tuples);
+		
+		//crossThree(foldLimit,envLimit, n, m, tuples);
+		
+		//imageAnalysis(n, m);
 		
 		endTime = System.nanoTime();
 		
@@ -1126,7 +1134,7 @@ public class OptDigits {
 	//
 	/* Threshold analysis */
 	
-	public static void memoryTransferThreshold(int foldLimit, int environmentLimit, int n, int m, int tuples, int threshold) {
+	public static void crossZero2(int foldLimit, int environmentLimit, int n, int m, int tuples, int threshold) {
 		
 		System.out.println("-- Experiments with threshold --");
 		
@@ -1375,7 +1383,7 @@ public class OptDigits {
 							
 							if(sum != 0) {
 								
-								if( ((m1-m2)/ (double) sum) < ( (double) threshold) / 10 ) {
+								if( ((m1-m2)/ (double) sum) < (10 / (double) threshold) ) {
 									
 									w1.train(String.valueOf(k), prototype.toString());
 									
@@ -1435,7 +1443,7 @@ public class OptDigits {
 							
 							if(sum != 0) {
 								
-								if( ((m1-m2)/ (double) sum) < ( (double) threshold) / 10 ) {
+								if( ((m1-m2)/ (double) sum) < (10 / (double) threshold) ) {
 									
 									w0.train(String.valueOf(k), prototype.toString());
 									
@@ -1564,7 +1572,7 @@ public class OptDigits {
 		
 	/* Classical Memory Transfer */ 
 
-	public static void memoryTransfer(int foldLimit, int environmentLimit, int n, int m, int tuples) {
+	public static void crossThree(int foldLimit, int environmentLimit, int n, int m, int tuples) {
 		
 		System.out.println("-- Classical memory transfer --");
 		
