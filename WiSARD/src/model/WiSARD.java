@@ -327,8 +327,6 @@ public class WiSARD {
 				
 					if(map.get(elemento.getKey()).getRams().get(l).getMapa().get(value.toString()) != null ) {
 						
-						
-						
 						if(map.get(elemento.getKey()).getRams().get(l).getMapa().get(value.toString()) > b)
 							
 							similarity[rel2.get(elemento.getKey())]++;

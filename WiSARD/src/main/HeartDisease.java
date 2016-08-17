@@ -40,16 +40,15 @@ public class HeartDisease {
 		
 		//run();
 		
-		
-		int foldLimit = 1,
+		/*int foldLimit = 1,
 			envLimit = 1,
 			n = 32,
 			m = 32,
-			tuples = 32;
+			tuples = 32;*/
 		
 		//crossZero2(foldLimit,envLimit, n, m, tuples, 4);
 		
-		crossZero3(foldLimit,envLimit, n, m, tuples, 4);
+		//crossZero3(foldLimit,envLimit, n, m, tuples, 4);
 		
 		//crossZero4(foldLimit,envLimit, n, m, tuples, 4, 4);
 		
