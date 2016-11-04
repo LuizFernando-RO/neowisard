@@ -482,6 +482,20 @@ public class WiSARD {
 		
 		int[] image = getMentalImage().get(label);
 		
+		int max = 0, min = this.maxBleaching;
+		float std;
+		
+		for (int i = 0; i < image.length; i++) {
+			if(image[i] > max)
+				max = image[i];
+			if(image[i] < min)
+				min = image[i];
+		}
+		
+		System.out.println("Hi");
+		
+		System.out.println(max + " " + min);
+		
 		BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
 		
 		for (int x = 0; x < img.getWidth(); x++) {
@@ -489,9 +503,16 @@ public class WiSARD {
 		    {
 		        int grayLevel = image[x*getWidth()+y];
 		        
+		        std = (grayLevel - min) / (float) (max - min);
+		        
+		        grayLevel = (int) (std * 255);
+		        
+		        System.out.print(grayLevel + "\t");
+		        
 		        int gray = (grayLevel << 16) + (grayLevel << 8) + grayLevel;
 		        img.setRGB( y, x, gray);
 		    }
+		    System.out.println();
 		}
 		
 		ImageIcon icon = new ImageIcon(img);

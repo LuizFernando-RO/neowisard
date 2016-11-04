@@ -40,19 +40,19 @@ public class OptDigits {
 		
 		//run();
 		
-		int foldLimit = 10,
-			envLimit = 20,
+		int foldLimit = 1,
+			envLimit = 2,
 			n = 32,
 			m = 32,
 			tuples = 32;
 		
-//		memoryTransfer(foldLimit,envLimit, n, m, tuples);
+		memoryTransfer(foldLimit,envLimit, n, m, tuples);
 		
-		memoryTransferThreshold(foldLimit, envLimit, n, m, tuples, 4);
+//		memoryTransferThreshold(foldLimit, envLimit, n, m, tuples, 4);
 		
-		memoryTransferThreshold(foldLimit, envLimit, n, m, tuples, 6);
+//		memoryTransferThreshold(foldLimit, envLimit, n, m, tuples, 6);
 		
-		memoryTransferThreshold(foldLimit, envLimit, n, m, tuples, 8);
+//		memoryTransferThreshold(foldLimit, envLimit, n, m, tuples, 8);
 		
 		endTime = System.nanoTime();
 		
@@ -1761,6 +1761,17 @@ public class OptDigits {
 					}
 										
 					bw1.close();
+					
+					w1.mentalImage("0");
+					w1.mentalImage("1");
+					w1.mentalImage("2");
+					w1.mentalImage("3");
+					w1.mentalImage("4");
+					w1.mentalImage("5");
+					w1.mentalImage("6");
+					w1.mentalImage("7");
+					w1.mentalImage("8");
+					w1.mentalImage("9");
 					
 					/*
 					 * MEMORY TRANSFER

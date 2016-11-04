@@ -29,13 +29,15 @@ public class MNIST {
 		
 		startTime = System.nanoTime();
 		
+		one();
+		
 		//test();
 		
 		//two();
 		
 		//three();
 		
-		crossZero(1,10);
+		//crossZero(1,10);
 		
 		//crossOne(1,10);
 		
@@ -99,7 +101,11 @@ public class MNIST {
 		
 		train(w1, 60000, "Input/MNIST/Original/training.csv");
 		test(w1, 10000, "Input/MNIST/Original/testing.csv");
+		
 		w1.generateMentalImages();
+		
+		/*
+		
 		w1.syntheticTrainingSet();
 		
 		int[][] teste = w1.getSyntheticTrainingSet().get("0");
@@ -114,7 +120,8 @@ public class MNIST {
 			System.out.print(teste[1][j]);
 		}
 		
-		/*
+		*/
+		
 		w1.mentalImage("0");
 		w1.mentalImage("1");
 		w1.mentalImage("2");
@@ -124,7 +131,7 @@ public class MNIST {
 		w1.mentalImage("6");
 		w1.mentalImage("7");
 		w1.mentalImage("8");
-		w1.mentalImage("9");*/
+		w1.mentalImage("9");
 	}
 	
 	public static void two() {
